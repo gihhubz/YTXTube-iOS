@@ -439,6 +439,24 @@ cộng đồng — video ít người xem có thể không có segment nào.
 - Trên điện thoại vẫn 1 cột như cũ (video, bình luận, rồi video đề
   xuất); ngăn bình luận trượt từ dưới lên không đổi.
 
+## Gợi ý video không còn trống + tương tác (sửa, 2026-11-15)
+
+- Nguyên nhân trống: gợi ý chỉ lấy từ `relatedStreams` của Piped
+  `/streams`, mà Piped thường trả rỗng (hoặc lỗi theo IP) nên sidebar
+  chỉ hiện một dòng "Không có video liên quan" — và khi `/streams`
+  lỗi hẳn thì sidebar trống hoàn toàn, không có cả dòng báo.
+- Giờ thử lần lượt: related của `/streams` → tìm theo tên kênh →
+  tìm theo từ khóa tiêu đề → trending VN; trong lúc chờ hiện
+  "Đang tải gợi ý…", nếu mọi nguồn đều lỗi/trống thì hiện nút "Thử
+  lại". Nhờ đó cả tính năng tự phát video tiếp theo (`relatedList[0]`)
+  cũng hoạt động khi Piped không trả related.
+- Tương tác trên từng video gợi ý: bấm vào video để mở (như cũ), thêm
+  3 nút **Lưu** (vào tab Đã lưu), **Chia sẻ** (mở hộp chia sẻ của máy
+  hoặc sao chép link) và **Ẩn** (xóa khỏi gợi ý, nhớ luôn lần sau).
+  Nút ⋮ trong gợi ý đã bỏ (trước đây bấm vào nó lại mở video thay vì
+  mở menu). Đã kiểm tra 6 tình huống dự phòng bằng Piped giả lập, đều
+  đạt.
+
 ## Chưa có (không port từ bản Android)
 
 PoToken, nhiều tài khoản YouTube, chế độ TV. Những
