@@ -428,6 +428,17 @@ cộng đồng — video ít người xem có thể không có segment nào.
 - Cùng lỗi `src=""` ở avatar kênh trong màn xem và đầu trang kênh cũng
   đã sửa sang DiceBear theo tên kênh.
 
+## Màn xem 2 cột như bản web gốc (sửa, 2026-11-15)
+
+- Trên màn hình rộng (≥900px) màn xem giờ có 2 cột như bản web gốc:
+  cột trái là video + tiêu đề + kênh + mô tả + lời + bình luận, cột
+  phải (380px) chỉ có "Recommended Videos" với các hàng ngang gọn
+  (ảnh 168px bên trái, tiêu đề/kênh/lượt xem bên phải, không avatar
+  kênh, không nút ⋮). Trước đây cột phải là bình luận nên video đề xuất
+  bị chìm dưới cả chục bình luận, phải cuộn mãi mới thấy.
+- Trên điện thoại vẫn 1 cột như cũ (video, bình luận, rồi video đề
+  xuất); ngăn bình luận trượt từ dưới lên không đổi.
+
 ## Chưa có (không port từ bản Android)
 
 PoToken, nhiều tài khoản YouTube, chế độ TV. Những
