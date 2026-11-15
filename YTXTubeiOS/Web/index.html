@@ -1,358 +1,294 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0f0f0f">
-<title>YTXTube — YouTube &amp; Music, ad-free</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="color-scheme" content="dark light">
+  <meta name="supported-color-profiles" content="display-p3">
+  <title>YTXTube</title>
+  <link rel="icon" href="icon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
-
-<div class="topbar">
-<header>
-  <a class="logo" href="#" id="homeBtn" aria-label="Home">
-    <span class="play"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span> YTXTube
-  </a>
-  <span class="header-spacer"></span>
-  <button class="icon-btn" id="searchToggleBtn" title="Search" aria-label="Search" data-i18n-title="common.search" data-i18n-aria="common.search"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20.87 20.17l-5.59-5.59C16.35 13.35 17 11.75 17 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.75 0 3.35-.65 4.58-1.71l5.59 5.59.7-.71zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" fill="currentColor"/></svg></button>
-  <button class="icon-btn avatar-btn" id="historyBtn" title="Sign in" aria-label="Sign in" data-i18n-title="profile.title" data-i18n-aria="profile.title"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/></svg></button>
-  <button class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings" data-i18n-title="common.settings" data-i18n-aria="common.settings"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" fill="currentColor"/></svg></button>
-</header>
-
-<div class="search-row" id="searchRow" hidden>
-  <div class="search-box">
-    <input id="searchInput" type="search" placeholder="Search videos, channels…" autocomplete="off" enterkeyhint="search" data-i18n-placeholder="search.placeholder">
-    <button id="searchBtn" aria-label="Search"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20.87 20.17l-5.59-5.59C16.35 13.35 17 11.75 17 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.75 0 3.35-.65 4.58-1.71l5.59 5.59.7-.71zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" fill="currentColor"/></svg></button>
-  </div>
-</div>
-
-<nav class="chips" id="chips" aria-label="Categories"></nav>
-</div>
-
-<main>
-  <!-- Home: trending feed (Android HomeFilter chips: All / Today / Videos / Subscribed / Live) -->
-  <section id="home">
-    <div class="channel-head" id="channelHead" hidden>
-      <img id="channelHeadAvatar" alt="" referrerpolicy="no-referrer">
-      <div class="channel-head-text"><div id="channelHeadName"></div><div class="meta" id="channelHeadMeta"></div></div>
-      <button class="subscribe-btn" id="channelHeadSubBtn">Subscribe</button>
+  
+  <header class="yt-header">
+    <div class="header-left">
+      <a href="#" class="yt-logo" id="logo-btn" title="YTXTube Home">
+        <img src="icon.png" alt="YTXTube" class="logo-img">
+        <span class="logo-text">YTXTube</span>
+      </a>
     </div>
-    <div class="shorts-shelf" id="shortsShelf" hidden>
-      <div class="shorts-shelf-head"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg><span data-i18n="shorts.title">Shorts</span></div>
-      <div class="shorts-shelf-row" id="shortsShelfRow"></div>
-    </div>
-    <div class="grid" id="grid"></div>
-    <div class="status" id="status"></div>
-  </section>
 
-  <!-- Watch: player screen, same order as Android (screenshot 03-player) -->
-  <!-- hidden here (not only via CSS) so the empty watch view never shows
-       when style.css fails to load — e.g. opening index.html directly
-       from a file viewer instead of over HTTP. JS removes it on open. -->
-  <section id="watch" hidden>
-    <button class="back-btn" id="backBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/></svg><span data-i18n="watch.back">Back</span></button>
-    <div class="watch-layout">
-      <div class="watch-main">
-        <div class="player-wrap" id="playerWrap"></div>
-        <div class="watch-time" id="watchTime" hidden>
-          <span class="watch-live-badge" id="watchLiveBadge" hidden data-i18n="common.live">Live</span>
-          <span id="watchCur">0:00</span>
-          <div class="watch-progress"><div id="watchProgressBar"></div></div>
-          <span id="watchDur"></span>
-          <button class="pill watch-back-live" id="watchBackToLiveBtn" hidden data-i18n="watch.backToLive">Back to live</button>
+    <div class="header-center">
+      <form class="search-form" id="search-form">
+        <div class="search-box">
+          <input type="text" id="search-input" placeholder="Search videos..." autocomplete="off">
+          <button type="button" class="clear-btn" id="clear-search" style="display: none;">
+            <svg viewBox="0 0 24 24" class="yt-icon"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" fill="currentColor"/></svg>
+          </button>
         </div>
-        <div class="watch-live-ended" id="watchLiveEnded" hidden data-i18n="watch.liveEnded">This live stream has ended.</div>
-        <h1 class="watch-title" id="watchTitle"></h1>
-        <div class="watch-meta" id="watchMeta"></div>
-        <div class="watch-row">
-          <div class="channel">
-            <img id="channelAvatar" alt="" referrerpolicy="no-referrer">
-            <div class="channel-text">
-              <span id="channelName"></span>
-              <span class="channel-subs" id="channelSubs"></span>
+        <button type="submit" class="search-btn" title="Search">
+          <svg viewBox="0 0 24 24" class="yt-icon"><path d="M20.87 20.17l-5.59-5.59C16.35 13.35 17 11.75 17 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.75 0 3.35-.65 4.58-1.71l5.59 5.59.7-.71zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" fill="currentColor"/></svg>
+        </button>
+      </form>
+    </div>
+
+    <div class="header-right">
+      
+      <button class="icon-btn mobile-search-btn" id="mobile-search-toggle" title="Search">
+        <svg viewBox="0 0 24 24" class="yt-icon"><path d="M20.87 20.17l-5.59-5.59C16.35 13.35 17 11.75 17 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.75 0 3.35-.65 4.58-1.71l5.59 5.59.7-.71zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" fill="currentColor"/></svg>
+      </button>
+
+      <button class="icon-btn" id="menu-dots-btn" title="More options">
+        <svg viewBox="0 0 24 24" class="yt-icon"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="mobile-search-overlay" id="mobile-search-overlay">
+    <button class="icon-btn" id="mobile-search-back" title="Back">
+      <svg viewBox="0 0 24 24" class="yt-icon"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/></svg>
+    </button>
+    <form class="mobile-search-form" id="mobile-search-form">
+      <input type="text" id="mobile-search-input" placeholder="Search YTXTube..." autocomplete="off">
+      <button type="submit" class="icon-btn" title="Search">
+        <svg viewBox="0 0 24 24" class="yt-icon"><path d="M20.87 20.17l-5.59-5.59C16.35 13.35 17 11.75 17 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.75 0 3.35-.65 4.58-1.71l5.59 5.59.7-.71zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" fill="currentColor"/></svg>
+      </button>
+    </form>
+  </div>
+
+  <main class="yt-main" id="main-content">
+    
+    <div class="chips-container" id="chips-bar">
+      <div class="chips-scroll" id="chips-scroll">
+        <button class="chip active" data-category="All">All</button>
+        <button class="chip" data-category="Music">Music</button>
+        <button class="chip" data-category="Gaming">Gaming</button>
+        <button class="chip" data-category="Anime">Anime</button>
+        <button class="chip" data-category="Trailers">Trailers</button>
+        <button class="chip" data-category="AI">AI</button>
+        <button class="chip" data-category="Podcasts">Podcasts</button>
+        <button class="chip" data-category="Sports">Sports</button>
+      </div>
+    </div>
+
+    <section class="feed-view" id="feed-view">
+      <div class="video-grid" id="video-grid">
+        
+      </div>
+      
+      <div class="infinite-loader" id="feed-loader">
+        <div class="spinner"></div>
+        <span>Loading more videos...</span>
+      </div>
+    </section>
+
+    <section class="watch-view" id="watch-view" style="display: none;">
+      <div class="watch-container">
+        
+        <div class="primary-column">
+          
+          <div class="player-wrapper" id="player-wrapper">
+            <div id="player-container" class="player-container">
+              
             </div>
           </div>
-          <button class="subscribe-btn" id="subscribeBtn">Subscribe</button>
-        </div>
-        <div class="actions">
-          <button class="pill" id="likeBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" fill="currentColor"/></svg><span id="likeCount"></span></button>
-          <button class="pill" id="dislikeBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z" fill="currentColor"/></svg><span id="dislikeCount"></span></button>
-          <button class="pill" id="saveBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z" fill="currentColor"/></svg><span data-i18n="watch.save">Save</span></button>
-          <button class="pill" id="downloadBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" fill="currentColor"/></svg><span data-i18n="watch.download">Download</span></button>
-          <button class="pill" id="qualityBtn" title="Playback quality" data-i18n-title="watch.quality"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" fill="currentColor"/></svg><span>Auto</span></button>
-          <button class="pill" id="shareBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M14 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11z" fill="currentColor"/></svg><span data-i18n="watch.share">Share</span></button>
-        </div>
-        <div class="desc" id="watchDesc"></div>
-        <button class="more-btn" id="moreBtn" hidden>...more</button>
-        <div class="lyrics-bar">
-          <button class="pill" id="lyricsBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/></svg><span data-i18n="watch.lyrics">Lyrics</span></button>
-          <span class="lyrics-hint" id="lyricsHint"></span>
-        </div>
-        <div class="lyrics-panel" id="lyricsPanel" hidden>
-          <div class="lyrics-head">
-            <span class="lyrics-title">LYRICS</span>
-            <span class="lyrics-lang"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM13.34 14H10.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h2.68c.09.65.16 1.32.16 2 0 .68-.07 1.35-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z" fill="currentColor"/></svg> EN</span>
-            <button id="lyricsCloseBtn" aria-label="Close lyrics">✕</button>
+
+          <div class="video-info">
+            <h1 class="video-title" id="watch-title">Video Title Loading...</h1>
+
+            <div class="video-actions-row">
+              <div class="channel-info">
+                <img class="channel-avatar-lg" id="watch-channel-avatar" src="" alt="Channel">
+                <div class="channel-text">
+                  <span class="channel-name-lg" id="watch-channel-name">Channel Name</span>
+                  <span class="channel-subs" id="watch-channel-subs">1.2M subscribers</span>
+                </div>
+                <button class="subscribe-btn" id="subscribe-btn">Subscribe</button>
+              </div>
+
+              <div class="action-buttons">
+                <div class="like-dislike-pill">
+                  <button class="like-btn" id="like-btn" title="Like">
+                    <svg viewBox="0 0 24 24" class="yt-icon"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" fill="currentColor"/></svg>
+                    <span id="watch-like-count">158K</span>
+                  </button>
+                  <div class="pill-divider"></div>
+                  <button class="dislike-btn" id="dislike-btn" title="Dislike">
+                    <svg viewBox="0 0 24 24" class="yt-icon"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z" fill="currentColor"/></svg>
+                  </button>
+                </div>
+
+                <button class="pill-action-btn" id="share-btn" title="Share">
+                  <svg viewBox="0 0 24 24" class="yt-icon"><path d="M14 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11z" fill="currentColor"/></svg>
+                  <span>Share</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="comments-section" id="comments-section">
+              
+              <div class="comments-preview-card" id="comments-preview-card">
+                <div class="comments-preview-header">
+                  <span class="comments-preview-title">Comments</span>
+                  <span class="comments-preview-count" id="comments-preview-count">184K</span>
+                </div>
+                <div class="comments-preview-body">
+                  <img class="comments-preview-avatar" id="comments-preview-avatar" src="icon.png" alt="User">
+                  <p class="comments-preview-text" id="comments-preview-text">Tap to view comments...</p>
+                </div>
+              </div>
+
+              <div class="desktop-comments-area" id="desktop-comments-area">
+                <div class="desktop-comments-header">
+                  <h3 class="desktop-comments-heading">Comments <span class="comments-count" id="desktop-comments-count">184K</span></h3>
+                </div>
+                <div class="desktop-comments-list" id="desktop-comments-list">
+                  
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="lyrics-status" id="lyricsStatus"></div>
-          <div class="lyrics-lines" id="lyricsLines"></div>
-          <button class="pill lyrics-retry" id="lyricsRetryBtn" hidden data-i18n="common.tryAgain">Try again</button>
         </div>
-        <aside class="comments">
-          <h2><span data-i18n="watch.comments">Comments</span> <span id="commentsCount"></span></h2>
-          <div id="comments"></div>
-        </aside>
+
+        <div class="secondary-column">
+          <h3 class="secondary-title">Recommended Videos</h3>
+          <div class="related-list" id="related-list">
+            
+          </div>
+          
+          <div class="related-loader" id="related-loader">
+            <div class="spinner"></div>
+            <span>Loading more recommendations...</span>
+          </div>
+        </div>
       </div>
-      <aside class="watch-sidebar">
-        <h2 data-i18n="watch.recommended">Recommended Videos</h2>
-        <div class="grid" id="relatedGrid"></div>
-      </aside>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <!-- Music player: Now Playing (Android screenshot 04-music-player) -->
-  <section id="music-player-view" aria-label="Now Playing" hidden>
-    <div class="mp-head">
-      <button class="icon-btn" id="mpBackBtn" aria-label="Back"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" fill="currentColor"/></svg></button>
-      <div class="mp-head-titles"><span class="mp-kicker">YTX MUSIC</span><span class="mp-now" data-i18n="music.nowPlaying">Now Playing</span></div>
-      <button class="icon-btn" id="mpMenuBtn" aria-label="More"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/></svg></button>
-    </div>
-    <div class="mp-art"><img id="mpArt" alt="" referrerpolicy="no-referrer"></div>
-    <div class="mp-track">
-      <div class="mp-track-text"><h1 id="mpTitle"></h1><div class="mp-artist" id="mpArtist"></div></div>
-      <button class="icon-btn mp-heart" id="mpLikeBtn" aria-label="Like"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C17.6 15.36 20 12.28 20 8.5 20 5.42 18.58 3 15.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z" fill="currentColor"/></svg></button>
-    </div>
-    <div class="mp-seek">
-      <input type="range" id="mpSeek" min="0" max="100" value="0" step="0.1" aria-label="Seek">
-      <div class="mp-times"><span id="mpCur">0:00</span><span id="mpDur">0:00</span></div>
-    </div>
-    <div class="mp-controls">
-      <button id="mpShuffleBtn" aria-label="Shuffle"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z" fill="currentColor"/></svg></button>
-      <button id="mpPrevBtn" aria-label="Previous"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" fill="currentColor"/></svg></button>
-      <button id="mpPlayBtn" class="mp-play" aria-label="Play or pause"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="currentColor"/></svg></button>
-      <button id="mpNextBtn" aria-label="Next"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" fill="currentColor"/></svg></button>
-      <button id="mpRepeatBtn" aria-label="Repeat"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z" fill="currentColor"/></svg></button>
-    </div>
-    <div class="mp-foot">
-      <span class="mp-quality" data-i18n="music.hqAudio">HQ AUDIO · 256 KBPS AAC</span>
-      <button class="pill" id="mpDownloadBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" fill="currentColor"/></svg><span data-i18n="watch.download">Download</span></button>
-      <button class="pill" id="mpLyricsBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/></svg><span data-i18n="watch.lyrics">Lyrics</span></button>
-      <button class="pill" id="mpQueueBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M3 10h11v2H3v-2zm0-4h11v2H3V6zm0 8h7v2H3v-2zm13-1v8l6-4-6-4z" fill="currentColor"/></svg><span data-i18n="music.queue">Queue</span></button>
-    </div>
-    <div class="mp-lyrics-card" id="mpLyricsCard" hidden>
-      <div class="lyrics-head">
-        <span class="lyrics-title">LYRICS</span>
-        <span class="lyrics-lang"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM13.34 14H10.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h2.68c.09.65.16 1.32.16 2 0 .68-.07 1.35-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z" fill="currentColor"/></svg> EN</span>
-        <button id="mpLyricsCloseBtn" aria-label="Close lyrics">✕</button>
+  <div class="modal-backdrop" id="comments-drawer-backdrop" style="display: none;">
+    <div class="comments-drawer" id="comments-drawer">
+      <div class="sheet-handle"></div>
+      <div class="comments-drawer-header">
+        <div class="comments-drawer-title-row">
+          <h3 class="comments-drawer-title">Comments</h3>
+          <span class="comments-drawer-count" id="comments-drawer-count">184K</span>
+        </div>
+        <button class="close-sheet-btn" id="close-comments-drawer-btn" title="Close">✕</button>
       </div>
-      <div class="lyrics-status" id="mpLyricsStatus"></div>
-      <div class="lyrics-lines" id="mpLyricsLines"></div>
-    </div>
-    <div class="mp-hidden-player" id="mpPlayerWrap"></div>
-  </section>
 
-  <!-- Music (Bước 3): YTX Music home — search + shelves like Android -->
-  <section id="music-view" aria-label="Music" hidden>
-    <h1 class="section-title">YTX Music</h1>
-    <div class="music-search">
-      <input id="musicSearchInput" type="search" placeholder="Search songs, artists…" autocomplete="off" enterkeyhint="search" data-i18n-placeholder="music.search.placeholder">
-      <button id="musicSearchBtn" aria-label="Search music"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20.87 20.17l-5.59-5.59C16.35 13.35 17 11.75 17 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.75 0 3.35-.65 4.58-1.71l5.59 5.59.7-.71zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" fill="currentColor"/></svg></button>
-    </div>
-    <nav class="music-chips" id="musicChips" aria-label="Music genres"></nav>
-    <h2 class="music-shelf-title" data-i18n="music.recent">Recently played</h2>
-    <div class="shelf-row" id="musicRecent"></div>
-    <h2 class="music-shelf-title" data-i18n="music.likedTracks">Liked tracks</h2>
-    <div class="shelf-row" id="musicLiked"></div>
-    <h2 class="music-shelf-title" data-i18n="music.browse">Browse</h2>
-    <div class="grid" id="musicGrid"></div>
-    <div class="status" id="musicStatus"></div>
-  </section>
+      <div class="comments-drawer-body">
+        <div class="add-comment-box">
+          <div class="user-avatar-sm">
+            <img src="icon.png" alt="User">
+          </div>
+          <input type="text" placeholder="Add a comment..." class="comment-input" readonly>
+        </div>
 
-  <!-- Library (Android tab 4): local history, liked videos, subscriptions -->
-  <section id="library-view" aria-label="Library" hidden>
-    <h1 class="section-title" data-i18n="library.title">Library</h1>
-    <h2 class="music-shelf-title" data-i18n="library.history">History</h2>
-    <div class="grid" id="libraryHistory"></div>
-    <h2 class="music-shelf-title" data-i18n="library.likedVideos">Liked videos</h2>
-    <div class="grid" id="libraryLiked"></div>
-    <h2 class="music-shelf-title" data-i18n="library.subscriptions">Subscriptions</h2>
-    <div id="librarySubs"></div>
-    <h2 class="music-shelf-title" data-i18n="library.storage">Storage</h2>
-    <div class="storage-box" id="storageBox">
-      <div class="meta" id="storageInfo">Checking storage…</div>
-      <div class="storage-actions">
-        <button class="pill" id="clearCacheBtn" data-i18n="library.clearCache">Clear cache</button>
+        <div class="comments-list" id="comments-list">
+          
+        </div>
       </div>
-      <p class="meta" data-i18n="library.clearCacheNote">Clear cache removes history, preferences and seen Shorts from this app only. It does not delete files you saved in the Files app.</p>
-    </div>
-  </section>
-
-  <!-- Saved (Android tab 5): Downloads (screenshot 07) + saved videos -->
-  <section id="saved-view" aria-label="Saved" hidden>
-    <h1 class="section-title" data-i18n="saved.title">Saved</h1>
-    <h2 class="music-shelf-title" data-i18n="saved.downloads">Downloads</h2>
-    <div class="dl-tabs" id="dlTabs" role="tablist" aria-label="Download type">
-      <button class="dl-tab active" id="dlTabVideos" data-dl="video"><span data-i18n="saved.videos">Videos</span> <span id="dlCountVideos"></span></button>
-      <button class="dl-tab" id="dlTabMusic" data-dl="audio"><span data-i18n="saved.music">Music</span> <span id="dlCountMusic"></span></button>
-    </div>
-    <div id="downloadsList"></div>
-    <h2 class="music-shelf-title" data-i18n="saved.savedVideos">Saved videos</h2>
-    <p class="meta" id="savedNote" data-i18n="saved.note">Videos you save show up here.</p>
-    <div class="grid" id="savedGrid"></div>
-    <div class="status" id="savedStatus"></div>
-  </section>
-
-  <!-- Settings (Bước 5, Android screenshot 08-settings): Appearance,
-       Playback, SponsorBlock, Data & Storage, About -->
-  <section id="settings-view" aria-label="Settings" hidden>
-    <button class="back-btn" id="settingsBackBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/></svg><span data-i18n="watch.back">Back</span></button>
-    <h1 class="section-title" data-i18n="settings.title">Settings</h1>
-    <h2 class="settings-section-title" data-i18n="settings.appearance">Appearance</h2>
-    <div class="settings-card">
-      <label class="settings-row"><span><span class="settings-title" data-i18n="settings.glass">Liquid Glass</span><span class="settings-sub" data-i18n="settings.glassSub">Frosted, see-through surfaces with depth and blur</span></span><span class="switch"><input type="checkbox" id="glassToggle"><span class="slider"></span></span></label>
-      <div class="settings-row"><span><span class="settings-title" data-i18n="settings.theme">Theme mode</span><span class="settings-sub" data-i18n="settings.themeSub">Choose how the app looks</span></span><span class="seg" id="themeSeg"><button data-theme="system" data-i18n="settings.system">System</button><button data-theme="dark" data-i18n="settings.dark">Dark</button><button data-theme="light" data-i18n="settings.light">Light</button><button data-theme="amoled">AMOLED</button></span></div>
-      <div class="settings-row lang-row"><span><span class="settings-title" data-i18n="settings.language">Language</span><span class="settings-sub" data-i18n="settings.languageSub">Interface language — follows your device when set to System</span></span><span class="seg lang-seg" id="langSeg"><button data-lang="system" data-i18n="settings.system">System</button><button data-lang="vi">Tiếng Việt</button><button data-lang="en">English</button><button data-lang="es">Español</button><button data-lang="zh">中文 (简体)</button><button data-lang="ja">日本語</button><button data-lang="ko">한국어</button></span></div>
-    </div>
-    <h2 class="settings-section-title" data-i18n="settings.playback">Playback</h2>
-    <div class="settings-card">
-      <label class="settings-row"><span><span class="settings-title" data-i18n="settings.bgPlayback">Background playback</span><span class="settings-sub" data-i18n="settings.bgPlaybackSub">Keep playing in the mini player when you leave the player</span></span><span class="switch"><input type="checkbox" id="bgPlaybackToggle"><span class="slider"></span></span></label>
-      <label class="settings-row"><span><span class="settings-title" data-i18n="settings.autoplayNext">Autoplay next video</span><span class="settings-sub" data-i18n="settings.autoplayNextSub">Play the next related video when this one ends</span></span><span class="switch"><input type="checkbox" id="autoplayNextToggle"><span class="slider"></span></span></label>
-      <div class="settings-row"><span><span class="settings-title" data-i18n="settings.playbackQuality">Playback quality</span><span class="settings-sub" id="settingsQualitySub">Auto</span></span><button class="pill" id="settingsQualityBtn" data-i18n="common.change">Change</button></div>
-    </div>
-    <h2 class="settings-section-title" data-i18n="settings.sponsorblock">SponsorBlock</h2>
-    <div class="settings-card">
-      <label class="settings-row"><span><span class="settings-title" data-i18n="settings.sponsorblock">SponsorBlock</span><span class="settings-sub" data-i18n="settings.sbSub">Automatically skip segments — community data from sponsor.ajay.app (CC BY-NC-SA 4.0)</span></span><span class="switch"><input type="checkbox" id="sbToggle"><span class="slider"></span></span></label>
-      <div id="sbCategories"></div>
-    </div>
-    <h2 class="settings-section-title" data-i18n="settings.dataStorage">Data &amp; Storage</h2>
-    <div class="settings-card">
-      <div class="settings-row"><span><span class="settings-title" data-i18n="sync.title">Cloud sync</span><span class="settings-sub" id="cloudSyncInfo">…</span></span></div>
-      <div class="settings-row"><span><span class="settings-title" data-i18n="sync.exportImport">Move data to another device</span><span class="settings-sub" data-i18n="sync.exportImportSub">Export a JSON file, then import it on the other device.</span></span><span style="display:flex;gap:8px"><button class="pill" id="exportDataBtn" data-i18n="sync.export">Export data</button><button class="pill" id="importDataBtn" data-i18n="sync.import">Import data</button></span></div>
-      <div class="settings-row"><span><span class="settings-title" data-i18n="settings.storageUsage">Storage usage</span><span class="settings-sub" id="settingsStorageInfo">Checking storage…</span></span></div>
-      <div class="settings-row"><span><span class="settings-title" data-i18n="settings.clearCache">Clear cache</span><span class="settings-sub" data-i18n="settings.clearCacheSub">Removes history, preferences and seen Shorts — not your likes, saves, downloads or subscriptions</span></span><button class="pill" id="settingsClearCacheBtn" data-i18n="library.clearCache">Clear cache</button></div>
-    </div>
-    <input type="file" id="importFileInput" accept=".json,application/json" hidden>
-    <h2 class="settings-section-title" data-i18n="settings.about">About</h2>
-    <div class="settings-card">
-      <div class="settings-row"><span><span class="settings-title" data-i18n="settings.version">Version</span><span class="settings-sub" data-i18n="settings.versionSub">YTXTube iOS v2.2.0 — clean-room port of Android YTXTube v2.2.0 (GPL-3.0)</span></span></div>
-      <div class="settings-row"><span><span class="settings-title" data-i18n="settings.accounts">Accounts</span><span class="settings-sub" data-i18n="settings.accountsSub">No Google sign-in in this build — subscriptions are stored on this device only.</span></span></div>
-    </div>
-  </section>
-
-  <!-- Shorts (Bước 2): full-screen vertical feed — top bar like Android (screenshot 02-shorts) -->
-  <section id="shorts-view" aria-label="Shorts" hidden>
-    <div class="shorts-top">
-      <button class="shorts-top-btn" id="shortsBackBtn" aria-label="Back"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/></svg></button>
-      <span class="shorts-title" data-i18n="shorts.title">Shorts</span>
-      <span class="shorts-top-right">
-        <button class="shorts-top-btn shorts-quality-btn" id="shortsQualityBtn" aria-label="Quality">HD</button>
-        <button class="shorts-top-btn" id="shortsMuteTopBtn" aria-label="Sound"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" fill="currentColor"/></svg></button>
-        <button class="shorts-top-btn" id="shortsRefreshBtn" aria-label="Refresh"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" fill="currentColor"/></svg></button>
-        <button class="shorts-top-btn" id="shortsSearchBtn" aria-label="Search"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20.87 20.17l-5.59-5.59C16.35 13.35 17 11.75 17 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.75 0 3.35-.65 4.58-1.71l5.59 5.59.7-.71zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" fill="currentColor"/></svg></button>
-      </span>
-    </div>
-    <div class="shorts-feed" id="shortsFeed"></div>
-    <div class="shorts-status" id="shortsStatus"></div>
-    <div class="shorts-hint" id="shortsHint" data-i18n="shorts.hint">Swipe up for the next video • Tap the video to mute / unmute</div>
-  </section>
-</main>
-
-<!-- Shorts comments drawer (same Piped data as the watch view) -->
-<div id="shortsCommentsDrawer" class="shorts-comments" hidden>
-  <div class="shorts-comments-head">
-    <span><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="currentColor"/></svg> <span data-i18n="watch.comments">Comments</span></span>
-    <button id="shortsCommentsClose" aria-label="Close comments">✕</button>
-  </div>
-  <div id="shortsCommentsList"></div>
-</div>
-
-<!-- Mini player (new in Android v2.2.0: YouTube-like mini player) -->
-<div id="miniPlayer" class="mini-player" hidden>
-  <img id="miniThumb" alt="" referrerpolicy="no-referrer">
-  <div class="mini-info"><div id="miniTitle"></div><div id="miniArtist"></div></div>
-  <button id="miniPlayBtn" aria-label="Play or pause"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="currentColor"/></svg></button>
-  <button id="miniNextBtn" aria-label="Next"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" fill="currentColor"/></svg></button>
-  <button id="miniCloseBtn" aria-label="Close">✕</button>
-  <div class="mini-progress"><div id="miniProgress"></div></div>
-</div>
-
-<!-- Bottom bar: Android v2.2.0 order Home | Music | Shorts | Library | Saved -->
-<nav class="bottom-nav" id="bottomNav" aria-label="Main navigation">
-  <button id="homeNavBtn" class="bottom-nav-btn active" aria-label="Home" data-i18n-aria="nav.home"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/></svg><span data-i18n="nav.home">Home</span></button>
-  <button id="musicNavBtn" class="bottom-nav-btn" aria-label="Music" data-i18n-aria="nav.music"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/></svg><span data-i18n="nav.music">Music</span></button>
-  <button id="shortsNavBtn" class="bottom-nav-btn" aria-label="Shorts" data-i18n-aria="nav.shorts"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg><span data-i18n="nav.shorts">Shorts</span></button>
-  <button id="libraryNavBtn" class="bottom-nav-btn" aria-label="Library" data-i18n-aria="nav.library"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z" fill="currentColor"/></svg><span data-i18n="nav.library">Library</span></button>
-  <button id="savedNavBtn" class="bottom-nav-btn" aria-label="Saved" data-i18n-aria="nav.saved"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z" fill="currentColor"/></svg><span data-i18n="nav.saved">Saved</span></button>
-</nav>
-
-<!-- Download sheet (Android screenshot 06-download-video) -->
-<div id="downloadSheet" class="sheet" hidden>
-  <div class="sheet-handle"></div>
-  <div class="sheet-head">
-    <h2 class="sheet-title" data-i18n="download.title">Download video</h2>
-    <button class="sheet-close" id="downloadCloseBtn" aria-label="Close">✕</button>
-  </div>
-  <div class="dl-video">
-    <img id="downloadThumb" alt="" referrerpolicy="no-referrer">
-    <div class="dl-video-text">
-      <div id="downloadSheetTitle" class="dl-video-title"></div>
-      <div id="downloadSheetChannel" class="meta"></div>
     </div>
   </div>
-  <div class="dl-status" id="downloadStatus"></div>
-  <div id="downloadList"></div>
-  <p class="meta dl-note" data-i18n="download.iosNote">On iOS the file opens in a new tab — long-press the video and choose “Save to Files”. Video and audio are separate streams on YouTube, so high-quality video may have no sound.</p>
-  <button class="dl-go" id="downloadGoBtn" disabled><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" fill="currentColor"/></svg><span>Download</span></button>
-  <button class="pill dl-copy" id="downloadCopyBtn" hidden data-i18n="download.copyLink">Copy link</button>
-  <button class="pill dl-copy" id="downloadRetryBtn" hidden data-i18n="download.retry">Try again</button>
-</div>
 
-<!-- Quality picker sheet -->
-<div id="qualitySheet" class="sheet" hidden>
-  <div class="sheet-handle"></div>
-  <div class="sheet-head">
-    <h2 class="sheet-title" data-i18n="quality.title">Quality</h2>
-    <button class="sheet-close" id="qualityCloseBtn" aria-label="Close">✕</button>
-  </div>
-  <p class="meta" id="qualityAutoNote"></p>
-  <div id="qualityList"></div>
-  <p class="meta dl-note" data-i18n="quality.note">Your choice is saved on this device and applied to every video and Short. HDR depends on the video and the device.</p>
-</div>
+  <div class="modal-backdrop" id="options-modal-backdrop" style="display: none;">
+    <div class="options-sheet" id="options-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h3 class="sheet-title">YTXTube</h3>
+        <button class="close-sheet-btn" id="close-options-btn">✕</button>
+      </div>
+      
+      <div class="sheet-content">
+        
+        <a href="https://github.com/Koustubh12345/YTXTube" target="_blank" rel="noopener noreferrer" class="sheet-item">
+          <div class="sheet-item-icon github-icon">
+            <svg viewBox="0 0 24 24" class="yt-icon"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.1-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z" fill="currentColor"/></svg>
+          </div>
+          <div class="sheet-item-text">
+            <div class="sheet-item-title">GitHub Repository</div>
+            <div class="sheet-item-desc">If you like the project, give a star on repo ⭐</div>
+          </div>
+          <svg viewBox="0 0 24 24" class="sheet-arrow"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" fill="currentColor"/></svg>
+        </a>
 
-<!-- Profile / sign-in sheet (Google + Email — no Apple ID) -->
-<div id="profileSheet" class="sheet" hidden>
-  <div class="sheet-handle"></div>
-  <div class="sheet-head">
-    <h2 class="sheet-title" id="profileSheetTitle" data-i18n="profile.title">Sign in</h2>
-    <button class="sheet-close" id="profileCloseBtn" aria-label="Close">✕</button>
-  </div>
-  <!-- Logged out: Google + Email -->
-  <div id="profileSignInView">
-    <div id="googleBtnWrap"></div>
-    <button class="profile-google-btn" id="googleSignInBtn"><span class="google-g" aria-hidden="true">G</span> <span data-i18n="profile.googleButton">Continue with Google</span></button>
-    <div class="profile-divider"><span data-i18n="profile.or">or</span></div>
-    <div class="profile-field"><label for="profileEmailInput" data-i18n="profile.emailLabel">Email</label><input id="profileEmailInput" type="email" placeholder="you@example.com" autocomplete="email" data-i18n-placeholder="profile.emailPlaceholder"></div>
-    <div class="profile-field"><label for="profileNameInput" data-i18n="profile.nameLabel">Display name</label><input id="profileNameInput" type="text" placeholder="Your name…" autocomplete="nickname" data-i18n-placeholder="profile.namePlaceholder"></div>
-    <div class="profile-field"><label data-i18n="profile.avatarLabel">Choose an avatar</label><div class="profile-avatars" id="profileAvatarPicker"></div></div>
-    <p class="meta" data-i18n="profile.localNote">Your Email profile is stored on this device only — it is not a real Google/YouTube account.</p>
-    <button class="profile-signin-btn" id="profileSignInBtn" data-i18n="profile.signIn">Sign in</button>
-  </div>
-  <!-- Logged in: profile -->
-  <div id="profileView" class="profile-view" hidden>
-    <div class="profile-avatar-big" id="profileAvatarBig"></div>
-    <div class="profile-name" id="profileName"></div>
-    <div class="profile-email" id="profileEmail"></div>
-    <span class="profile-method" id="profileMethod"></span>
-    <button class="profile-signout-btn" id="profileSignOutBtn" data-i18n="profile.signOut">Sign out</button>
-    <p class="meta" id="profileDataNote"></p>
-  </div>
-</div>
+        <a href="https://t.me/getthefckoutofheree" target="_blank" rel="noopener noreferrer" class="sheet-item">
+          <div class="sheet-item-icon">
+            <svg viewBox="0 0 24 24" class="yt-icon"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z" fill="currentColor"/></svg>
+          </div>
+          <div class="sheet-item-text">
+            <div class="sheet-item-title">Developer</div>
+            <div class="sheet-item-desc">@getthefckoutofheree (Telegram)</div>
+          </div>
+          <svg viewBox="0 0 24 24" class="sheet-arrow"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" fill="currentColor"/></svg>
+        </a>
 
-<div id="toast" role="status"></div>
-<button id="commentsFab"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="currentColor"/></svg><span data-i18n="watch.commentsFab">Comments</span></button>
-<noscript><p style="padding:16px">YTXTube needs JavaScript enabled. Open this page over HTTP (not as a single file) so style.css and app.js load with it.</p></noscript>
-<script src="https://www.youtube.com/iframe_api"></script>
-<script src="app.js"></script>
+        <a href="https://t.me/TenSeiChadChat" target="_blank" rel="noopener noreferrer" class="sheet-item">
+          <div class="sheet-item-icon">
+            <svg viewBox="0 0 24 24" class="yt-icon"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="currentColor"/></svg>
+          </div>
+          <div class="sheet-item-text">
+            <div class="sheet-item-title">Community</div>
+            <div class="sheet-item-desc">TenSeiChadChat (Join Telegram)</div>
+          </div>
+          <svg viewBox="0 0 24 24" class="sheet-arrow"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" fill="currentColor"/></svg>
+        </a>
+
+        <div class="sheet-item" id="open-donate-btn">
+          <div class="sheet-item-icon donate-icon">
+            <svg viewBox="0 0 24 24" class="yt-icon"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="currentColor"/></svg>
+          </div>
+          <div class="sheet-item-text">
+            <div class="sheet-item-title">Donate / Support</div>
+            <div class="sheet-item-desc">Support project with UPI / QR code</div>
+          </div>
+          <svg viewBox="0 0 24 24" class="sheet-arrow"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z" fill="currentColor"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="donate-modal-backdrop" style="display: none;">
+    <div class="donate-dialog" id="donate-dialog">
+      <div class="sheet-handle"></div>
+      <div class="donate-header">
+        <h3 class="donate-title">Support YTXTube</h3>
+        <button class="close-sheet-btn" id="close-donate-btn">✕</button>
+      </div>
+
+      <div class="donate-body">
+        <p class="donate-subtitle">Scan QR or use any UPI payment app to donate any amount:</p>
+        
+        <div class="qr-container">
+          <img src="upi_qr.png" alt="UPI QR Code" id="donate-qr-img" class="donate-qr-img">
+        </div>
+
+        <div class="upi-id-box">
+          <span class="upi-label">UPI ID:</span>
+          <span class="upi-value" id="upi-id-text">koustubhgaikwad7-1@okaxis</span>
+          <button class="copy-upi-btn" id="copy-upi-btn" title="Copy UPI ID">Copy</button>
+        </div>
+
+        <div class="donate-actions">
+          <button class="btn-save-qr" id="save-qr-btn">
+            <svg viewBox="0 0 24 24" class="yt-icon" style="width: 18px; height: 18px;"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z" fill="currentColor"/></svg>
+            Save QR Code
+          </button>
+          
+          <button class="btn-donate-now" id="donate-now-btn">
+            <svg viewBox="0 0 24 24" class="yt-icon" style="width: 18px; height: 18px;"><path d="M7 2v11h3v9l7-12h-4l4-8z" fill="currentColor"/></svg>
+            Donate Now
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
