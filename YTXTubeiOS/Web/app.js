@@ -492,7 +492,7 @@ en: {
 'watch.moreVideos': 'More videos', 'watch.recommended': 'Recommended Videos', 'watch.more': '...more', 'watch.less': '...less',
 'watch.loading': 'Loading…', 'watch.loadError': 'Could not load video info, but the player is still running.',
 'watch.noComments': 'No comments yet.', 'watch.commentsError': 'Could not load comments right now.',
-'watch.noRelated': 'No related videos.', 'watch.loadingComments': 'Loading comments…',
+'watch.noRelated': 'No related videos.', 'watch.loadingComments': 'Loading comments…', 'watch.loadingRelated': 'Loading suggestions…', 'related.hide': '✕ Hide',
 'download.title': 'Download video', 'download.gettingLinks': 'Getting download links…',
 'download.noStreams': 'No downloadable streams for this video — it may be age-restricted or a live stream.',
 'download.noLinks': 'Couldn’t get download links — check your connection and try again.',
@@ -554,7 +554,7 @@ en: {
 'sb.skipped': 'Skipped {label} segment', 'sb.on': 'SponsorBlock on.', 'sb.off': 'SponsorBlock off.',
 'toast.pipedBusy': 'Piped is busy — showing fallback videos.', 'toast.searchFailed': 'Search failed — check your connection and try again.',
 'toast.linkCopied': 'Video link copied.', 'toast.likedAdded': 'Added to Liked videos.', 'toast.likedRemoved': 'Removed from Liked videos.',
-'toast.savedAdded': 'Saved — find it in the Saved tab.', 'toast.savedRemoved': 'Removed from Saved.',
+'toast.savedAdded': 'Saved — find it in the Saved tab.', 'toast.savedRemoved': 'Removed from Saved.', 'toast.relatedHidden': 'Video hidden from suggestions.',
 'toast.subscribed': 'Subscribed to {name}.', 'toast.unsubscribed': 'Unsubscribed from {name}.',
 'toast.cacheCleared': 'Cache cleared — history, preferences and seen Shorts were removed.',
 'toast.glassOn': 'Liquid Glass on.', 'toast.glassOff': 'Liquid Glass off — using solid surfaces.',
@@ -634,7 +634,7 @@ vi: {
 'watch.moreVideos': 'Video khác', 'watch.recommended': 'Video đề xuất', 'watch.more': '...xem thêm', 'watch.less': '...thu gọn',
 'watch.loading': 'Đang tải…', 'watch.loadError': 'Không tải được thông tin video, nhưng trình phát vẫn đang chạy.',
 'watch.noComments': 'Chưa có bình luận.', 'watch.commentsError': 'Không tải được bình luận lúc này.',
-'watch.noRelated': 'Không có video liên quan.', 'watch.loadingComments': 'Đang tải bình luận…',
+'watch.noRelated': 'Không có video liên quan.', 'watch.loadingComments': 'Đang tải bình luận…', 'watch.loadingRelated': 'Đang tải gợi ý…', 'related.hide': '✕ Ẩn',
 'download.title': 'Tải video', 'download.gettingLinks': 'Đang lấy link tải…',
 'download.noStreams': 'Video này không có luồng tải được — có thể bị giới hạn độ tuổi hoặc đang phát trực tiếp.',
 'download.noLinks': 'Không lấy được link tải — kiểm tra mạng rồi thử lại.',
@@ -696,7 +696,7 @@ vi: {
 'sb.skipped': 'Đã bỏ qua đoạn {label}', 'sb.on': 'Đã bật SponsorBlock.', 'sb.off': 'Đã tắt SponsorBlock.',
 'toast.pipedBusy': 'Piped đang bận — đang hiện video dự phòng.', 'toast.searchFailed': 'Tìm kiếm thất bại — kiểm tra mạng rồi thử lại.',
 'toast.linkCopied': 'Đã sao chép link video.', 'toast.likedAdded': 'Đã thêm vào Video đã thích.', 'toast.likedRemoved': 'Đã xóa khỏi Video đã thích.',
-'toast.savedAdded': 'Đã lưu — xem trong tab Đã lưu.', 'toast.savedRemoved': 'Đã xóa khỏi Đã lưu.',
+'toast.savedAdded': 'Đã lưu — xem trong tab Đã lưu.', 'toast.savedRemoved': 'Đã xóa khỏi Đã lưu.', 'toast.relatedHidden': 'Đã ẩn video khỏi gợi ý.',
 'toast.subscribed': 'Đã đăng ký {name}.', 'toast.unsubscribed': 'Đã hủy đăng ký {name}.',
 'toast.cacheCleared': 'Đã xóa bộ nhớ đệm — lịch sử, tùy chọn và Shorts đã xem đã bị xóa.',
 'toast.glassOn': 'Đã bật Kính lỏng.', 'toast.glassOff': 'Đã tắt Kính lỏng — dùng bề mặt đặc.',
@@ -846,7 +846,7 @@ I18N.es = {
 'watch.save': '🔖 Guardar', 'watch.saved': '🔖 Guardado', 'watch.download': '⬇ Descargar', 'watch.quality': 'Calidad', 'watch.share': '↗ Compartir',
 'watch.lyrics': '🎵 Letra', 'watch.hideLyrics': '🎵 Ocultar letra', 'watch.comments': 'Comentarios', 'watch.commentsFab': '💬 Comentarios',
 'watch.moreVideos': 'Más videos', 'watch.recommended': 'Vídeos recomendados', 'watch.more': '...más', 'watch.less': '...menos',
-'watch.loading': 'Cargando…', 'watch.noComments': 'Aún no hay comentarios.', 'watch.loadingComments': 'Cargando comentarios…',
+'watch.loading': 'Cargando…', 'watch.noComments': 'Aún no hay comentarios.', 'watch.loadingComments': 'Cargando comentarios…', 'watch.loadingRelated': 'Cargando sugerencias…', 'related.hide': '✕ Ocultar',
 'download.title': 'Descargar video', 'download.gettingLinks': 'Obteniendo enlaces de descarga…',
 'download.go': '⬇ Descargar', 'download.copyLink': 'Copiar enlace', 'download.retry': 'Reintentar',
 'download.videoAudio': 'video + audio', 'download.videoOnly': 'solo video (sin sonido)',
@@ -883,7 +883,7 @@ I18N.es = {
 'sb.interaction': 'Recordatorio de me gusta y suscripción', 'sb.musicOfftopic': 'Parte sin música de un video musical',
 'toast.searchFailed': 'La búsqueda falló — revisa tu conexión e inténtalo de nuevo.',
 'toast.linkCopied': 'Enlace del video copiado.', 'toast.likedAdded': 'Añadido a videos que te gustan.', 'toast.likedRemoved': 'Eliminado de videos que te gustan.',
-'toast.savedAdded': 'Guardado — encuéntralo en la pestaña Guardados.', 'toast.savedRemoved': 'Eliminado de Guardados.',
+'toast.savedAdded': 'Guardado — encuéntralo en la pestaña Guardados.', 'toast.savedRemoved': 'Eliminado de Guardados.', 'toast.relatedHidden': 'Vídeo oculto de las sugerencias.',
 'status.noVideos': 'No se encontraron videos.', 'status.noMore': 'No hay más videos — prueba otro filtro.',
 'status.loadingTrending': 'Cargando tendencias…',
 'profile.title': 'Iniciar sesión',
@@ -1022,7 +1022,7 @@ I18N.zh = {
 'watch.save': '🔖 保存', 'watch.saved': '🔖 已保存', 'watch.download': '⬇ 下载', 'watch.quality': '画质', 'watch.share': '↗ 分享',
 'watch.lyrics': '🎵 歌词', 'watch.hideLyrics': '🎵 隐藏歌词', 'watch.comments': '评论', 'watch.commentsFab': '💬 评论',
 'watch.moreVideos': '更多视频', 'watch.recommended': '推荐视频', 'watch.more': '...更多', 'watch.less': '...收起',
-'watch.loading': '加载中…', 'watch.noComments': '暂无评论。', 'watch.loadingComments': '正在加载评论…',
+'watch.loading': '加载中…', 'watch.noComments': '暂无评论。', 'watch.loadingComments': '正在加载评论…', 'watch.loadingRelated': '正在加载推荐…', 'related.hide': '✕ 隐藏',
 'download.title': '下载视频', 'download.gettingLinks': '正在获取下载链接…',
 'download.go': '⬇ 下载', 'download.copyLink': '复制链接', 'download.retry': '重试',
 'download.videoAudio': '视频 + 音频', 'download.videoOnly': '仅视频（无声音）',
@@ -1059,7 +1059,7 @@ I18N.zh = {
 'sb.interaction': '点赞和订阅提醒', 'sb.musicOfftopic': '音乐视频中的非音乐部分',
 'toast.searchFailed': '搜索失败——请检查网络后重试。',
 'toast.linkCopied': '视频链接已复制。', 'toast.likedAdded': '已加入喜欢的视频。', 'toast.likedRemoved': '已从喜欢的视频中移除。',
-'toast.savedAdded': '已保存——在“已保存”标签页中查看。', 'toast.savedRemoved': '已从已保存中移除。',
+'toast.savedAdded': '已保存——在“已保存”标签页中查看。', 'toast.savedRemoved': '已从已保存中移除。', 'toast.relatedHidden': '已从推荐中隐藏该视频。',
 'status.noVideos': '未找到视频。', 'status.noMore': '没有更多视频了——换个筛选试试。',
 'status.loadingTrending': '正在加载热门视频…',
 'profile.title': '登录',
@@ -1198,7 +1198,7 @@ I18N.ja = {
 'watch.save': '🔖 保存', 'watch.saved': '🔖 保存済み', 'watch.download': '⬇ ダウンロード', 'watch.quality': '画質', 'watch.share': '↗ 共有',
 'watch.lyrics': '🎵 歌詞', 'watch.hideLyrics': '🎵 歌詞を隠す', 'watch.comments': 'コメント', 'watch.commentsFab': '💬 コメント',
 'watch.moreVideos': '関連動画', 'watch.recommended': 'おすすめ動画', 'watch.more': '...もっと見る', 'watch.less': '...閉じる',
-'watch.loading': '読み込み中…', 'watch.noComments': 'コメントはまだありません。', 'watch.loadingComments': 'コメントを読み込み中…',
+'watch.loading': '読み込み中…', 'watch.noComments': 'コメントはまだありません。', 'watch.loadingComments': 'コメントを読み込み中…', 'watch.loadingRelated': 'おすすめを読み込み中…', 'related.hide': '✕ 非表示',
 'download.title': '動画をダウンロード', 'download.gettingLinks': 'ダウンロードリンクを取得中…',
 'download.go': '⬇ ダウンロード', 'download.copyLink': 'リンクをコピー', 'download.retry': '再試行',
 'download.videoAudio': '動画 + 音声', 'download.videoOnly': '動画のみ（音声なし）',
@@ -1235,7 +1235,7 @@ I18N.ja = {
 'sb.interaction': '高評価と登録のお願い', 'sb.musicOfftopic': 'ミュージックビデオの音楽以外の部分',
 'toast.searchFailed': '検索に失敗しました — 接続を確認して再試行してください。',
 'toast.linkCopied': '動画リンクをコピーしました。', 'toast.likedAdded': '高評価した動画に追加しました。', 'toast.likedRemoved': '高評価した動画から削除しました。',
-'toast.savedAdded': '保存しました — 「保存済み」タブで確認できます。', 'toast.savedRemoved': '保存済みから削除しました。',
+'toast.savedAdded': '保存しました — 「保存済み」タブで確認できます。', 'toast.savedRemoved': '保存済みから削除しました。', 'toast.relatedHidden': 'おすすめから動画を非表示にしました。',
 'status.noVideos': '動画が見つかりませんでした。', 'status.noMore': 'これ以上動画はありません — 別のフィルターを試してください。',
 'status.loadingTrending': 'トレンドを読み込み中…',
 'profile.title': 'ログイン',
@@ -1374,7 +1374,7 @@ I18N.ko = {
 'watch.save': '🔖 저장', 'watch.saved': '🔖 저장됨', 'watch.download': '⬇ 다운로드', 'watch.quality': '화질', 'watch.share': '↗ 공유',
 'watch.lyrics': '🎵 가사', 'watch.hideLyrics': '🎵 가사 숨기기', 'watch.comments': '댓글', 'watch.commentsFab': '💬 댓글',
 'watch.moreVideos': '관련 동영상', 'watch.recommended': '추천 동영상', 'watch.more': '...더보기', 'watch.less': '...접기',
-'watch.loading': '불러오는 중…', 'watch.noComments': '댓글이 없습니다.', 'watch.loadingComments': '댓글을 불러오는 중…',
+'watch.loading': '불러오는 중…', 'watch.noComments': '댓글이 없습니다.', 'watch.loadingComments': '댓글을 불러오는 중…', 'watch.loadingRelated': '추천 동영상 불러오는 중…', 'related.hide': '✕ 숨기기',
 'download.title': '동영상 다운로드', 'download.gettingLinks': '다운로드 링크를 가져오는 중…',
 'download.go': '⬇ 다운로드', 'download.copyLink': '링크 복사', 'download.retry': '다시 시도',
 'download.videoAudio': '동영상 + 오디오', 'download.videoOnly': '동영상만 (소리 없음)',
@@ -1411,7 +1411,7 @@ I18N.ko = {
 'sb.interaction': '좋아요 및 구독 알림', 'sb.musicOfftopic': '뮤직비디오의 음악이 아닌 부분',
 'toast.searchFailed': '검색에 실패했습니다 — 연결을 확인하고 다시 시도하세요.',
 'toast.linkCopied': '동영상 링크가 복사되었습니다.', 'toast.likedAdded': '좋아요한 동영상에 추가했습니다.', 'toast.likedRemoved': '좋아요한 동영상에서 삭제했습니다.',
-'toast.savedAdded': '저장했습니다 — 저장됨 탭에서 확인하세요.', 'toast.savedRemoved': '저장됨에서 삭제했습니다.',
+'toast.savedAdded': '저장했습니다 — 저장됨 탭에서 확인하세요.', 'toast.savedRemoved': '저장됨에서 삭제했습니다.', 'toast.relatedHidden': '추천에서 동영상을 숨겼습니다.',
 'status.noVideos': '동영상을 찾을 수 없습니다.', 'status.noMore': '더 이상 동영상이 없습니다 — 다른 필터를 시도하세요.',
 'status.loadingTrending': '인기 동영상을 불러오는 중…',
 'profile.title': '로그인',
@@ -1541,6 +1541,7 @@ let rendered = 0;         // đã vẽ bao nhiêu thẻ (cuộn vô hạn)
 let currentCategory = 'all';
 let currentVideo = null;  // video đang xem
 let relatedList = [];     // related videos of the open video (mini player Next)
+let hiddenRelated = new Set(store.get('hiddenRelated', [])); // ids đã ẩn khỏi gợi ý
 let player = null;        // YT.Player (watch view or music player — one at a time)
 let playerPlaying = false; // last known state (YT.PlayerState.PLAYING = 1)
 let ytApiReady = false;
@@ -1744,7 +1745,7 @@ function videoId(v) {
 }
 // Android home card (screenshot 01-home): full-width thumbnail, duration
 // badge, channel avatar + title + channel • views • time, ⋮ menu at right.
-function cardHTML(v) {
+function cardHTML(v, opts) {
   const id = videoId(v);
   const thumb = v.thumbnail || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
   const channel = v.uploaderName || v.uploader || '';
@@ -1758,6 +1759,7 @@ function cardHTML(v) {
       <div class="card-text">
         <h3>${esc(v.title)}</h3>
         <div class="meta">${esc(channel)} • ${fmtViews(v.views)}${dateText ? ' • ' + esc(dateText) : ''}</div>
+        ${opts && opts.actions ? `<div class="card-actions"><button data-act="save">${esc(t('watch.save'))}</button><button data-act="share">${esc(t('watch.share'))}</button><button data-act="hide">${esc(t('related.hide'))}</button></div>` : ''}
       </div>
       <button class="card-menu" data-menu="${esc(id)}" aria-label="More options">⋮</button>
     </div>
@@ -2047,15 +2049,68 @@ async function openVideo(id, opts = {}) {
     $('moreBtn').hidden = fullDesc.length <= 180;
     $('moreBtn').textContent = t('watch.more');
     syncWatchButtons();
-    relatedList = (data.relatedStreams || []).filter((v) => videoId(v)).slice(0, 12);
-    $('relatedGrid').innerHTML = relatedList.map(cardHTML).join('') || `<p class="meta">${esc(t('watch.noRelated'))}</p>`;
+    loadRelated(id, data);
     // Mở từ tab Nhạc, hoặc tiêu đề giống nhạc → tự mở lời bài hát.
     if (opts.fromMusic || isMusicLike(data.title || '')) openLyrics();
   } catch {
     $('watchTitle').textContent = t('watch.loadError');
-    $('relatedGrid').innerHTML = '';
+    loadRelated(id, null);
   }
   loadComments(id);
+}
+// ---------- Gợi ý video (sidebar) ----------
+// Piped /streams thường trả relatedStreams rỗng (hoặc lỗi theo IP) nên
+// sidebar trống. Thử lần lượt: related của /streams → tìm theo tên kênh
+// → tìm theo từ khóa tiêu đề → trending VN. Không bao giờ để trống hẳn
+// mà không có nút thử lại.
+let relatedContext = null;
+async function searchVideoItems(q) {
+  try {
+    const data = await piped(`/search?q=${encodeURIComponent(q)}&filter=videos`);
+    return (data.items || []).filter((v) => videoId(v));
+  } catch { return []; }
+}
+function titleKeywords(title) {
+  const stop = new Set(['the', 'a', 'an', 'and', 'or', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'from', 'official', 'video', 'music', 'hd', '4k', 'remastered', 'ft', 'feat', 'mv', 'lyrics', 'full', 'live', 'episode', 'ep', 'season', 'part', 'new', 'remix', 'audio']);
+  return String(title || '').toLowerCase().replace(/[^a-zà-ỹ0-9\s]+/g, ' ').split(/\s+/).filter((w) => w.length > 2 && !stop.has(w)).slice(0, 3);
+}
+function renderRelatedList() {
+  const items = relatedList.filter((v) => !hiddenRelated.has(videoId(v)));
+  $('relatedGrid').innerHTML = items.length
+    ? items.map((v) => cardHTML(v, { actions: true })).join('')
+    : `<p class="meta">${esc(t('watch.noRelated'))}</p><button class="pill" data-retry-related>${esc(t('common.tryAgain'))}</button>`;
+}
+async function loadRelated(id, streamData) {
+  relatedContext = { id, title: streamData ? (streamData.title || '') : (relatedContext ? relatedContext.title : ''), uploader: streamData ? (streamData.uploader || '') : (relatedContext ? relatedContext.uploader : '') };
+  $('relatedGrid').innerHTML = `<div class="status"><div class="spinner"></div>${esc(t('watch.loadingRelated'))}</div>`;
+  let items = [];
+  let data = streamData;
+  if (!data) { try { data = await piped(`/streams/${id}`); } catch { data = null; } }
+  if (data) items = (data.relatedStreams || []).filter((v) => videoId(v));
+  if (!items.length && relatedContext.uploader) {
+    items = (await searchVideoItems(relatedContext.uploader)).filter((v) => videoId(v) !== id);
+  }
+  if (!items.length) {
+    const kw = titleKeywords(relatedContext.title);
+    if (kw.length) items = (await searchVideoItems(kw.join(' '))).filter((v) => videoId(v) !== id);
+  }
+  if (!items.length) {
+    try {
+      const trending = await piped('/trending?region=VN');
+      items = (Array.isArray(trending) ? trending : []).filter((v) => videoId(v) && videoId(v) !== id);
+    } catch { /* bỏ qua: dưới hiện trống + nút thử lại */ }
+  }
+  relatedList = items.slice(0, 12);
+  renderRelatedList();
+}
+async function shareVideoLink(v) {
+  const url = `https://www.youtube.com/watch?v=${videoId(v)}`;
+  if (navigator.share) {
+    try { await navigator.share({ title: v.title || '', url }); return; }
+    catch { /* huỷ: rơi xuống copy */ }
+  }
+  try { await navigator.clipboard.writeText(url); toast(t('toast.linkCopied')); }
+  catch { toast(url); }
 }
 // Sync Like / Dislike / Save / Subscribe pills with local state.
 function syncWatchButtons() {
@@ -3532,6 +3587,24 @@ grid.addEventListener('click', (e) => {
   if (card) openVideo(card.dataset.id);
 });
 $('relatedGrid').addEventListener('click', (e) => {
+  const retry = e.target.closest('[data-retry-related]');
+  if (retry) { if (relatedContext) loadRelated(relatedContext.id, null); return; }
+  const actBtn = e.target.closest('[data-act]');
+  if (actBtn) {
+    const card = actBtn.closest('.card');
+    const v = card && relatedList.find((x) => videoId(x) === card.dataset.id);
+    if (!v) return;
+    const act = actBtn.dataset.act;
+    if (act === 'save') { toggleSave(v); renderRelatedList(); }
+    else if (act === 'share') { shareVideoLink(v); }
+    else if (act === 'hide') {
+      hiddenRelated.add(videoId(v));
+      store.set('hiddenRelated', [...hiddenRelated]);
+      toast(t('toast.relatedHidden'));
+      renderRelatedList();
+    }
+    return;
+  }
   const card = e.target.closest('.card');
   if (card) openVideo(card.dataset.id);
 });
