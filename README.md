@@ -415,6 +415,19 @@ cộng đồng — video ít người xem có thể không có segment nào.
   thì đồng hồ dừng đúng chỗ. VOD và live dùng chung 1 vòng tick 1 giây,
   chỉ khác live có thêm huy hiệu TRỰC TIẾP + nút "Quay lại trực tiếp".
 
+## Bình luận: avatar + giờ đăng (sửa, 2026-11-15)
+
+- Piped `/comments` trả `thumbnail: null` cho mọi bình luận nên bản cũ
+  render `<img src="">` và hiện icon ảnh vỡ ở mọi avatar. Bản sửa dùng
+  DiceBear identicon theo tên tác giả khi không có ảnh thật — đúng cách
+  bản web gốc làm (`c.thumbnail || dicebear.com/7.x/identicon/...`);
+  ảnh thật (nếu có) vẫn dùng, lỗi tải thì tự đổi sang DiceBear.
+- Giờ bình luận: Piped trả sẵn chuỗi tương đối ("6 years ago") nên hiện
+  nguyên chuỗi đó; chỉ khi nào là timestamp số mới tính tương đối qua
+  `timeAgo` (trước đây chuỗi đi qua `timeAgo` nên ra "NaN năm trước").
+- Cùng lỗi `src=""` ở avatar kênh trong màn xem và đầu trang kênh cũng
+  đã sửa sang DiceBear theo tên kênh.
+
 ## Chưa có (không port từ bản Android)
 
 PoToken, nhiều tài khoản YouTube, chế độ TV. Những
