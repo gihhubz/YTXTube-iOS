@@ -1847,8 +1847,9 @@ function showFeed(list, mode = 'feed') {
   seenFeedIds = new Set(list.map((v) => videoId(v)).filter(Boolean));
   grid.innerHTML = '';
   if (mode === 'channel') feedExhausted = true; // video của 1 kênh: hết là hết, không bổ sung video lạ
-  if (!list.length) { showStatus(t('status.noVideos')); return; }
+  if (!list.length) { showStatus(t('status.noVideos')); syncHomeShortsShelf(); return; }
   renderBatch();
+  syncHomeShortsShelf();
 }
 function appendFeedItems(items) {
   for (const v of items) seenFeedIds.add(videoId(v));
@@ -2722,6 +2723,7 @@ async function loadShorts(refresh = false) {
   if (shortsSeen.size > 200) shortsSeen = new Set([...shortsSeen].slice(-100));
   store.set('shortsSeen', [...shortsSeen]);
   renderShorts({ toTop: refresh });
+  renderHomeShortsShelf();
   if (refresh) toast(t('shorts.refreshToast'));
 }
 function openShorts() {
@@ -2744,6 +2746,40 @@ function openShorts() {
   setActiveTab('shorts');
   if (!shortsList.length) loadShorts();
   else renderShorts({ toTop: true });
+}
+// ---------- Kệ Shorts ở đầu trang Home ----------
+// Hàng ngang video ngắn 9:16 (kiểu kệ Shorts của YouTube): bấm vào một
+// thẻ thì mở trình Shorts ngay tại video đó.
+function renderHomeShortsShelf() {
+  const shelf = $('shortsShelf');
+  const row = $('shortsShelfRow');
+  if (!shelf || !row) return;
+  const items = shortsList.slice(0, 10);
+  if (!items.length) { shelf.hidden = true; return; }
+  shelf.hidden = false;
+  row.innerHTML = items.map((v) => {
+    const id = videoId(v);
+    const thumb = v.thumbnail || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
+    return `<div class="shorts-shelf-card" data-shorts-id="${esc(id)}" role="button" tabindex="0">
+      <img src="${esc(thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer">
+      <div class="shorts-shelf-title-text">${esc(v.title || 'Shorts')}</div>
+      <div class="shorts-shelf-meta">${v.views ? esc(formatViews(v.views)) : ''}</div>
+    </div>`;
+  }).join('');
+}
+// Chỉ hiện kệ trên feed Home mặc định (không hiện khi tìm kiếm, xem kênh
+// hay lọc chip khác); chưa có dữ liệu thì tải Shorts rồi vẽ kệ khi xong.
+function syncHomeShortsShelf() {
+  const shelf = $('shortsShelf');
+  if (!shelf) return;
+  if (feedMode !== 'feed' || currentCategory !== 'all') { shelf.hidden = true; return; }
+  if (shortsList.length) renderHomeShortsShelf();
+  else loadShorts();
+}
+function openShortsAt(id) {
+  const i = shortsList.findIndex((v) => videoId(v) === id);
+  if (i > 0) { const [v] = shortsList.splice(i, 1); shortsList.unshift(v); }
+  openShorts();
 }
 function closeShorts() {
   if ($('shorts-view').hidden) return;
@@ -3729,6 +3765,16 @@ $('importFileInput').addEventListener('change', (e) => { importDataFile(e.target
 $('watchBackToLiveBtn').addEventListener('click', jumpToLiveEdge);
 // Feed tải thêm lỗi mạng → nút thử lại trong #status.
 statusEl.addEventListener('click', (e) => { if (e.target.closest('[data-feed-retry]')) loadMoreFeed(); });
+// Kệ Shorts đầu Home: bấm (hoặc Enter/Space) vào thẻ thì mở trình Shorts tại video đó.
+$('shortsShelfRow').addEventListener('click', (e) => {
+  const card = e.target.closest('[data-shorts-id]');
+  if (card) openShortsAt(card.dataset.shortsId);
+});
+$('shortsShelfRow').addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const card = e.target.closest('[data-shorts-id]');
+  if (card) { e.preventDefault(); openShortsAt(card.dataset.shortsId); }
+});
 $('mpDownloadBtn').addEventListener('click', () => openDownloadSheet(currentMusic ? currentMusic.video : currentVideo));
 $('shortsQualityBtn').addEventListener('click', openQualitySheet);
 $('dlTabVideos').addEventListener('click', () => { dlTab = 'video'; renderDownloads(); });
