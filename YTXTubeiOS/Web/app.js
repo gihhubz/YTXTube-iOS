@@ -299,6 +299,22 @@ let gisLoaded = false, gisLoading = false, googleBtnRendered = false;
 function saveProfile(p) { profile = p; try { localStorage.setItem('ytxtube:profile', JSON.stringify(p)); } catch { /* ignore */ } }
 function clearProfile() { profile = null; try { localStorage.removeItem('ytxtube:profile'); } catch { /* ignore */ } }
 function avatarColor(name) { const colors = ['#e53935', '#8e24aa', '#3949ab', '#00897b', '#7cb342', '#fb8c00', '#6d4c41', '#546e7a']; let h = 0; const s = String(name || '?'); for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return colors[h % colors.length]; }
+// Avatar bình luận kiểu bản web gốc: Piped /comments trả thumbnail: null nên
+// <img src=""> hiện icon ảnh vỡ. Dùng DiceBear identicon theo tên tác giả,
+// giống bản web gốc (bản gốc cũng dùng DiceBear khi thiếu avatar).
+function dicebearAvatar(seed) {
+  return `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(String(seed || 'YT'))}`;
+}
+function commentAvatar(c) {
+  const thumb = c && typeof c.thumbnail === 'string' ? c.thumbnail.trim() : '';
+  return thumb || dicebearAvatar(c && c.author);
+}
+function commentTimeText(c) {
+  const ct = c && c.commentedTime;
+  if (!ct) return '';
+  if (typeof ct === 'string') return ct; // Piped trả sẵn dạng "6 years ago"
+  return timeAgo(ct);
+}
 function avatarHTML(p) {
   if (!p) return '👤';
   if (p.avatar && /^https?:\/\//.test(p.avatar)) return `<img src="${esc(p.avatar)}" alt="" referrerpolicy="no-referrer">`;
@@ -2024,7 +2040,7 @@ async function openVideo(id, opts = {}) {
     $('channelName').textContent = data.uploader || '';
     $('channelSubs').textContent = data.uploaderSubscriberCount
       ? `${formatCount(data.uploaderSubscriberCount)} ${t('common.subscribers')}` : '';
-    $('channelAvatar').src = data.uploaderAvatar || '';
+    $('channelAvatar').src = data.uploaderAvatar || dicebearAvatar(data.uploader);
     const fullDesc = data.description || '';
     $('watchDesc').dataset.full = fullDesc;
     $('watchDesc').textContent = fullDesc.length > 180 ? fullDesc.slice(0, 180) + '…' : fullDesc;
@@ -2060,12 +2076,15 @@ async function loadComments(id) {
     const list = data.comments || [];
     $('commentsCount').textContent = data.commentCount ? formatCount(data.commentCount, '') : '';
     $('comments').innerHTML = list.length
-      ? list.slice(0, 40).map((c) => `<div class="comment">
-          <img src="${esc(c.thumbnail || '')}" alt="" loading="lazy" referrerpolicy="no-referrer">
-          <div><div class="who">${esc(c.author)} <span>${timeAgo(c.commentedTime)}</span></div>
+      ? list.slice(0, 40).map((c) => {
+          const av = commentAvatar(c);
+          return `<div class="comment">
+          <img src="${esc(av)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${esc(dicebearAvatar(c.author))}'">
+          <div><div class="who">${esc(c.author || '@user')} <span>${esc(commentTimeText(c))}</span></div>
           <p>${esc(c.commentText)}</p>
           <div class="likes">👍 ${c.likeCount ? formatCount(c.likeCount) : 0}</div></div>
-        </div>`).join('')
+        </div>`;
+        }).join('')
       : `<p class="meta">${esc(t('watch.noComments'))}</p>`;
   } catch {
     $('comments').innerHTML = `<p class="meta">${esc(t('watch.commentsError'))}</p>`;
@@ -2650,12 +2669,15 @@ async function openShortsComments(id) {
     const data = await piped(`/comments/${id}`);
     const comments = data.comments || [];
     list.innerHTML = comments.length
-      ? comments.slice(0, 40).map((c) => `<div class="comment">
-          <img src="${esc(c.thumbnail || '')}" alt="" loading="lazy" referrerpolicy="no-referrer">
-          <div><div class="who">${esc(c.author)} <span>${timeAgo(c.commentedTime)}</span></div>
+      ? comments.slice(0, 40).map((c) => {
+          const av = commentAvatar(c);
+          return `<div class="comment">
+          <img src="${esc(av)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${esc(dicebearAvatar(c.author))}'">
+          <div><div class="who">${esc(c.author || '@user')} <span>${esc(commentTimeText(c))}</span></div>
           <p>${esc(c.commentText)}</p>
           <div class="likes">👍 ${c.likeCount ? formatCount(c.likeCount) : 0}</div></div>
-        </div>`).join('')
+        </div>`;
+        }).join('')
       : `<p class="meta">${esc(t('watch.noComments'))}</p>`;
   } catch {
     list.innerHTML = `<p class="meta">${esc(t('watch.commentsError'))}</p>`;
@@ -3403,7 +3425,7 @@ function updateChannelHeadSubBtn() {
 async function openChannel(name) {
   closeLibrary(); closeSaved(); closeShorts();
   $('channelHead').hidden = false;
-  $('channelHeadAvatar').src = (subMeta[name] && subMeta[name].avatar) || '';
+  $('channelHeadAvatar').src = (subMeta[name] && subMeta[name].avatar) || dicebearAvatar(name);
   $('channelHeadName').textContent = name;
   $('channelHeadMeta').textContent = t('common.channel');
   updateChannelHeadSubBtn();
