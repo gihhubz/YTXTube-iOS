@@ -180,7 +180,18 @@ main { max-width: 1280px; margin: 0 auto; padding: 8px 16px 60px; }
 }
 .watch-layout { display: grid; grid-template-columns: 1fr; gap: 24px; }
 @media (min-width: 900px) {
-  .watch-layout { grid-template-columns: minmax(0, 1fr) 360px; }
+  .watch-layout { grid-template-columns: minmax(0, 1fr) 380px; }
+}
+.watch-sidebar h2 { font-size: 17px; margin-bottom: 12px; }
+#relatedGrid { grid-template-columns: 1fr; }
+/* Cột phải "Recommended Videos" như bản web gốc: hàng ngang gọn
+   (ảnh nhỏ bên trái, tiêu đề/kênh/lượt xem bên phải), chỉ trên desktop. */
+@media (min-width: 900px) {
+  #relatedGrid .card { display: flex; gap: 12px; align-items: flex-start; }
+  #relatedGrid .thumb { flex: 0 0 168px; }
+  #relatedGrid .card-body { margin-top: 0; }
+  #relatedGrid .card-avatar, #relatedGrid .card-menu { display: none; }
+  #relatedGrid .card h3 { font-size: 14px; }
 }
 
 /* ---------- Bình luận ---------- */

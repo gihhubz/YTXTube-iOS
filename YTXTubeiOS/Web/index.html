@@ -49,7 +49,7 @@
   <section id="watch" hidden>
     <button class="back-btn" id="backBtn" data-i18n="watch.back">← Back</button>
     <div class="watch-layout">
-      <div>
+      <div class="watch-main">
         <div class="player-wrap" id="playerWrap"></div>
         <div class="watch-time" id="watchTime" hidden>
           <span class="watch-live-badge" id="watchLiveBadge" hidden data-i18n="common.live">Live</span>
@@ -95,12 +95,14 @@
           <div class="lyrics-lines" id="lyricsLines"></div>
           <button class="pill lyrics-retry" id="lyricsRetryBtn" hidden data-i18n="common.tryAgain">Try again</button>
         </div>
+        <aside class="comments">
+          <h2><span data-i18n="watch.comments">Comments</span> <span id="commentsCount"></span></h2>
+          <div id="comments"></div>
+        </aside>
       </div>
-      <aside class="comments">
-        <h2><span data-i18n="watch.comments">Comments</span> <span id="commentsCount"></span></h2>
-        <div id="comments"></div>
-        <h2 id="relatedTitle" style="margin-top:24px" data-i18n="watch.moreVideos">More videos</h2>
-        <div class="grid" id="relatedGrid" style="grid-template-columns:1fr"></div>
+      <aside class="watch-sidebar">
+        <h2 data-i18n="watch.recommended">Recommended Videos</h2>
+        <div class="grid" id="relatedGrid"></div>
       </aside>
     </div>
   </section>
