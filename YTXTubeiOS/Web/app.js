@@ -316,10 +316,10 @@ function commentTimeText(c) {
   return timeAgo(ct);
 }
 function avatarHTML(p) {
-  if (!p) return '👤';
+  if (!p) return icon('account');
   if (p.avatar && /^https?:\/\//.test(p.avatar)) return `<img src="${esc(p.avatar)}" alt="" referrerpolicy="no-referrer">`;
   if (p.avatar === 'letter') return `<span class="avatar-letter" style="background:${avatarColor(p.name || '?')}">${esc((p.name || '?').trim().charAt(0).toUpperCase())}</span>`;
-  return esc(p.avatar || '👤');
+  return p.avatar ? esc(p.avatar) : icon('account');
 }
 function syncProfileUI() {
   const btn = $('historyBtn');
@@ -480,25 +480,25 @@ en: {
 'chip.all': 'All', 'chip.today': 'Today', 'chip.videos': 'Videos', 'chip.subscribed': 'Subscribed', 'chip.live': 'Live',
 'music.search.placeholder': 'Search songs, artists…',
 'music.chip.forYou': 'For You', 'music.chip.vietnamese': 'Vietnamese', 'music.chip.usUk': 'US-UK', 'music.chip.kPop': 'K-Pop', 'music.chip.loFi': 'Lo-fi', 'music.chip.remix': 'Remix',
-'music.nowPlaying': 'Now Playing', 'music.hqAudio': 'HQ AUDIO · 256 KBPS AAC', 'music.lyrics': '🎵 Lyrics', 'music.queue': '🎶 Queue',
+'music.nowPlaying': 'Now Playing', 'music.hqAudio': 'HQ AUDIO · 256 KBPS AAC', 'music.lyrics': 'Lyrics', 'music.queue': 'Queue',
 'music.recent': 'Recently played', 'music.likedTracks': 'Liked tracks', 'music.browse': 'Browse',
 'music.noRecent': 'No recent music yet.', 'music.noLiked': 'No liked tracks yet — tap ♥ on any track.',
 'music.noSongs': 'No songs found — try another search.', 'music.loading': 'Loading music…',
 'music.queueToast': 'Queue: {n} track{s} — now playing #{i}.', 'music.endQueue': 'End of queue.', 'music.nothingNext': 'Nothing next to play.',
 'music.loadError': 'Could not load music — check your connection and try again.',
-'watch.back': '← Back', 'watch.subscribe': 'Subscribe', 'watch.subscribed': 'Subscribed ✓',
-'watch.save': '🔖 Save', 'watch.saved': '🔖 Saved', 'watch.download': '⬇ Download', 'watch.quality': 'Quality', 'watch.share': '↗ Share',
-'watch.lyrics': '🎵 Lyrics', 'watch.hideLyrics': '🎵 Hide lyrics', 'watch.comments': 'Comments', 'watch.commentsFab': '💬 Comments',
+'watch.back': 'Back', 'watch.subscribe': 'Subscribe', 'watch.subscribed': 'Subscribed ✓',
+'watch.save': 'Save', 'watch.saved': 'Saved', 'watch.download': 'Download', 'watch.quality': 'Quality', 'watch.share': 'Share',
+'watch.lyrics': 'Lyrics', 'watch.hideLyrics': 'Hide lyrics', 'watch.comments': 'Comments', 'watch.commentsFab': 'Comments',
 'watch.moreVideos': 'More videos', 'watch.recommended': 'Recommended Videos', 'watch.more': '...more', 'watch.less': '...less',
 'watch.loading': 'Loading…', 'watch.loadError': 'Could not load video info, but the player is still running.',
 'watch.noComments': 'No comments yet.', 'watch.commentsError': 'Could not load comments right now.',
-'watch.noRelated': 'No related videos.', 'watch.loadingComments': 'Loading comments…', 'watch.loadingRelated': 'Loading suggestions…', 'related.hide': '✕ Hide',
+'watch.noRelated': 'No related videos.', 'watch.loadingComments': 'Loading comments…', 'watch.loadingRelated': 'Loading suggestions…', 'related.hide': 'Hide',
 'download.title': 'Download video', 'download.gettingLinks': 'Getting download links…',
 'download.noStreams': 'No downloadable streams for this video — it may be age-restricted or a live stream.',
 'download.noLinks': 'Couldn’t get download links — check your connection and try again.',
 'download.noLinksBlocked': 'Couldn’t get download links — YouTube is blocking this server right now. Try again later.',
 'download.openedNote': 'Opened in a new tab — <b>long-press the video and choose “Save to Files”</b> (or “Save to Photos” for MP4). Find it later in Saved → Downloads.',
-'download.go': '⬇ Download', 'download.copyLink': 'Copy link', 'download.retry': 'Try again',
+'download.go': 'Download', 'download.copyLink': 'Copy link', 'download.retry': 'Try again',
 'download.videoAudio': 'video + audio', 'download.videoOnly': 'video only (no sound)',
 'download.sizeUnknown': 'Size unknown', 'download.openedStatus': 'Opened in Safari — save from there',
 'download.noDownloads': 'No downloads yet — tap Download on any video.',
@@ -622,25 +622,25 @@ vi: {
 'chip.all': 'Tất cả', 'chip.today': 'Hôm nay', 'chip.videos': 'Video', 'chip.subscribed': 'Đã đăng ký', 'chip.live': 'Trực tiếp',
 'music.search.placeholder': 'Tìm bài hát, nghệ sĩ…',
 'music.chip.forYou': 'Dành cho bạn', 'music.chip.vietnamese': 'Nhạc Việt', 'music.chip.usUk': 'US-UK', 'music.chip.kPop': 'K-Pop', 'music.chip.loFi': 'Lo-fi', 'music.chip.remix': 'Remix',
-'music.nowPlaying': 'Đang phát', 'music.hqAudio': 'ÂM THANH CHẤT LƯỢNG CAO · 256 KBPS AAC', 'music.lyrics': '🎵 Lời bài hát', 'music.queue': '🎶 Hàng đợi',
+'music.nowPlaying': 'Đang phát', 'music.hqAudio': 'ÂM THANH CHẤT LƯỢNG CAO · 256 KBPS AAC', 'music.lyrics': 'Lời bài hát', 'music.queue': 'Hàng đợi',
 'music.recent': 'Nghe gần đây', 'music.likedTracks': 'Bài hát đã thích', 'music.browse': 'Khám phá',
 'music.noRecent': 'Chưa có nhạc nghe gần đây.', 'music.noLiked': 'Chưa có bài hát đã thích — chạm ♥ ở bài hát bất kỳ.',
 'music.noSongs': 'Không tìm thấy bài hát — thử tìm khác.', 'music.loading': 'Đang tải nhạc…',
 'music.queueToast': 'Hàng đợi: {n} bài — đang phát bài #{i}.', 'music.endQueue': 'Đã hết hàng đợi.', 'music.nothingNext': 'Không còn gì để phát tiếp.',
 'music.loadError': 'Không tải được nhạc — kiểm tra mạng rồi thử lại.',
-'watch.back': '← Quay lại', 'watch.subscribe': 'Đăng ký', 'watch.subscribed': 'Đã đăng ký ✓',
-'watch.save': '🔖 Lưu', 'watch.saved': '🔖 Đã lưu', 'watch.download': '⬇ Tải xuống', 'watch.quality': 'Chất lượng', 'watch.share': '↗ Chia sẻ',
-'watch.lyrics': '🎵 Lời bài hát', 'watch.hideLyrics': '🎵 Ẩn lời bài hát', 'watch.comments': 'Bình luận', 'watch.commentsFab': '💬 Bình luận',
+'watch.back': 'Quay lại', 'watch.subscribe': 'Đăng ký', 'watch.subscribed': 'Đã đăng ký ✓',
+'watch.save': 'Lưu', 'watch.saved': 'Đã lưu', 'watch.download': 'Tải xuống', 'watch.quality': 'Chất lượng', 'watch.share': 'Chia sẻ',
+'watch.lyrics': 'Lời bài hát', 'watch.hideLyrics': 'Ẩn lời bài hát', 'watch.comments': 'Bình luận', 'watch.commentsFab': 'Bình luận',
 'watch.moreVideos': 'Video khác', 'watch.recommended': 'Video đề xuất', 'watch.more': '...xem thêm', 'watch.less': '...thu gọn',
 'watch.loading': 'Đang tải…', 'watch.loadError': 'Không tải được thông tin video, nhưng trình phát vẫn đang chạy.',
 'watch.noComments': 'Chưa có bình luận.', 'watch.commentsError': 'Không tải được bình luận lúc này.',
-'watch.noRelated': 'Không có video liên quan.', 'watch.loadingComments': 'Đang tải bình luận…', 'watch.loadingRelated': 'Đang tải gợi ý…', 'related.hide': '✕ Ẩn',
+'watch.noRelated': 'Không có video liên quan.', 'watch.loadingComments': 'Đang tải bình luận…', 'watch.loadingRelated': 'Đang tải gợi ý…', 'related.hide': 'Ẩn',
 'download.title': 'Tải video', 'download.gettingLinks': 'Đang lấy link tải…',
 'download.noStreams': 'Video này không có luồng tải được — có thể bị giới hạn độ tuổi hoặc đang phát trực tiếp.',
 'download.noLinks': 'Không lấy được link tải — kiểm tra mạng rồi thử lại.',
 'download.noLinksBlocked': 'Không lấy được link tải — YouTube đang chặn máy chủ này. Thử lại sau.',
 'download.openedNote': 'Đã mở trong tab mới — <b>nhấn giữ video rồi chọn “Lưu vào Tệp”</b> (hoặc “Lưu vào Ảnh” với MP4). Xem lại trong Đã lưu → Tải xuống.',
-'download.go': '⬇ Tải xuống', 'download.copyLink': 'Sao chép link', 'download.retry': 'Thử lại',
+'download.go': 'Tải xuống', 'download.copyLink': 'Sao chép link', 'download.retry': 'Thử lại',
 'download.videoAudio': 'video + âm thanh', 'download.videoOnly': 'chỉ video (không tiếng)',
 'download.sizeUnknown': 'Không rõ dung lượng', 'download.openedStatus': 'Đã mở trong Safari — lưu từ đó',
 'download.noDownloads': 'Chưa có lượt tải nào — chạm Tải xuống ở video bất kỳ.',
@@ -838,17 +838,17 @@ I18N.es = {
 'chip.all': 'Todo', 'chip.today': 'Hoy', 'chip.videos': 'Videos', 'chip.subscribed': 'Suscripciones', 'chip.live': 'En vivo',
 'music.search.placeholder': 'Buscar canciones, artistas…',
 'music.chip.forYou': 'Para ti', 'music.chip.vietnamese': 'Vietnamita', 'music.chip.usUk': 'EE. UU. y Reino Unido', 'music.chip.kPop': 'K-Pop', 'music.chip.loFi': 'Lo-fi', 'music.chip.remix': 'Remix',
-'music.nowPlaying': 'Reproduciendo', 'music.lyrics': '🎵 Letra', 'music.queue': '🎶 Cola',
+'music.nowPlaying': 'Reproduciendo', 'music.lyrics': 'Letra', 'music.queue': 'Cola',
 'music.recent': 'Reproducido recientemente', 'music.likedTracks': 'Canciones que te gustan', 'music.browse': 'Explorar',
 'music.noRecent': 'Aún no hay música reciente.', 'music.noLiked': 'Aún no hay canciones que te gusten — toca ♥ en cualquier canción.',
 'music.noSongs': 'No se encontraron canciones — prueba otra búsqueda.', 'music.loading': 'Cargando música…',
-'watch.back': '← Atrás', 'watch.subscribe': 'Suscribirse', 'watch.subscribed': 'Suscrito ✓',
-'watch.save': '🔖 Guardar', 'watch.saved': '🔖 Guardado', 'watch.download': '⬇ Descargar', 'watch.quality': 'Calidad', 'watch.share': '↗ Compartir',
-'watch.lyrics': '🎵 Letra', 'watch.hideLyrics': '🎵 Ocultar letra', 'watch.comments': 'Comentarios', 'watch.commentsFab': '💬 Comentarios',
+'watch.back': 'Atrás', 'watch.subscribe': 'Suscribirse', 'watch.subscribed': 'Suscrito ✓',
+'watch.save': 'Guardar', 'watch.saved': 'Guardado', 'watch.download': 'Descargar', 'watch.quality': 'Calidad', 'watch.share': 'Compartir',
+'watch.lyrics': 'Letra', 'watch.hideLyrics': 'Ocultar letra', 'watch.comments': 'Comentarios', 'watch.commentsFab': 'Comentarios',
 'watch.moreVideos': 'Más videos', 'watch.recommended': 'Vídeos recomendados', 'watch.more': '...más', 'watch.less': '...menos',
-'watch.loading': 'Cargando…', 'watch.noComments': 'Aún no hay comentarios.', 'watch.loadingComments': 'Cargando comentarios…', 'watch.loadingRelated': 'Cargando sugerencias…', 'related.hide': '✕ Ocultar',
+'watch.loading': 'Cargando…', 'watch.noComments': 'Aún no hay comentarios.', 'watch.loadingComments': 'Cargando comentarios…', 'watch.loadingRelated': 'Cargando sugerencias…', 'related.hide': 'Ocultar',
 'download.title': 'Descargar video', 'download.gettingLinks': 'Obteniendo enlaces de descarga…',
-'download.go': '⬇ Descargar', 'download.copyLink': 'Copiar enlace', 'download.retry': 'Reintentar',
+'download.go': 'Descargar', 'download.copyLink': 'Copiar enlace', 'download.retry': 'Reintentar',
 'download.videoAudio': 'video + audio', 'download.videoOnly': 'solo video (sin sonido)',
 'download.sizeUnknown': 'Tamaño desconocido',
 'quality.title': 'Calidad', 'quality.auto': 'Automática', 'quality.audioOnly': 'Solo audio',
@@ -1014,17 +1014,17 @@ I18N.zh = {
 'chip.all': '全部', 'chip.today': '今天', 'chip.videos': '视频', 'chip.subscribed': '已订阅', 'chip.live': '直播',
 'music.search.placeholder': '搜索歌曲、歌手…',
 'music.chip.forYou': '为你推荐', 'music.chip.vietnamese': '越南音乐', 'music.chip.usUk': '欧美音乐', 'music.chip.kPop': 'K-Pop', 'music.chip.loFi': 'Lo-fi', 'music.chip.remix': '混音',
-'music.nowPlaying': '正在播放', 'music.lyrics': '🎵 歌词', 'music.queue': '🎶 播放队列',
+'music.nowPlaying': '正在播放', 'music.lyrics': '歌词', 'music.queue': '播放队列',
 'music.recent': '最近播放', 'music.likedTracks': '喜欢的歌曲', 'music.browse': '浏览',
 'music.noRecent': '暂无最近播放的音乐。', 'music.noLiked': '暂无喜欢的歌曲——点任意歌曲上的 ♥。',
 'music.noSongs': '未找到歌曲——换个关键词试试。', 'music.loading': '正在加载音乐…',
-'watch.back': '← 返回', 'watch.subscribe': '订阅', 'watch.subscribed': '已订阅 ✓',
-'watch.save': '🔖 保存', 'watch.saved': '🔖 已保存', 'watch.download': '⬇ 下载', 'watch.quality': '画质', 'watch.share': '↗ 分享',
-'watch.lyrics': '🎵 歌词', 'watch.hideLyrics': '🎵 隐藏歌词', 'watch.comments': '评论', 'watch.commentsFab': '💬 评论',
+'watch.back': '返回', 'watch.subscribe': '订阅', 'watch.subscribed': '已订阅 ✓',
+'watch.save': '保存', 'watch.saved': '已保存', 'watch.download': '下载', 'watch.quality': '画质', 'watch.share': '分享',
+'watch.lyrics': '歌词', 'watch.hideLyrics': '隐藏歌词', 'watch.comments': '评论', 'watch.commentsFab': '评论',
 'watch.moreVideos': '更多视频', 'watch.recommended': '推荐视频', 'watch.more': '...更多', 'watch.less': '...收起',
-'watch.loading': '加载中…', 'watch.noComments': '暂无评论。', 'watch.loadingComments': '正在加载评论…', 'watch.loadingRelated': '正在加载推荐…', 'related.hide': '✕ 隐藏',
+'watch.loading': '加载中…', 'watch.noComments': '暂无评论。', 'watch.loadingComments': '正在加载评论…', 'watch.loadingRelated': '正在加载推荐…', 'related.hide': '隐藏',
 'download.title': '下载视频', 'download.gettingLinks': '正在获取下载链接…',
-'download.go': '⬇ 下载', 'download.copyLink': '复制链接', 'download.retry': '重试',
+'download.go': '下载', 'download.copyLink': '复制链接', 'download.retry': '重试',
 'download.videoAudio': '视频 + 音频', 'download.videoOnly': '仅视频（无声音）',
 'download.sizeUnknown': '大小未知',
 'quality.title': '画质', 'quality.auto': '自动', 'quality.audioOnly': '仅音频',
@@ -1190,17 +1190,17 @@ I18N.ja = {
 'chip.all': 'すべて', 'chip.today': '今日', 'chip.videos': '動画', 'chip.subscribed': '登録済み', 'chip.live': 'ライブ',
 'music.search.placeholder': '曲やアーティストを検索…',
 'music.chip.forYou': 'あなたへのおすすめ', 'music.chip.vietnamese': 'ベトナム音楽', 'music.chip.usUk': 'US-UK', 'music.chip.kPop': 'K-Pop', 'music.chip.loFi': 'Lo-fi', 'music.chip.remix': 'リミックス',
-'music.nowPlaying': '再生中', 'music.lyrics': '🎵 歌詞', 'music.queue': '🎶 キュー',
+'music.nowPlaying': '再生中', 'music.lyrics': '歌詞', 'music.queue': 'キュー',
 'music.recent': '最近再生した曲', 'music.likedTracks': 'お気に入りの曲', 'music.browse': 'ブラウズ',
 'music.noRecent': '最近の音楽はまだありません。', 'music.noLiked': 'お気に入りの曲はまだありません — 曲の ♥ をタップしてください。',
 'music.noSongs': '曲が見つかりませんでした — 別の検索を試してください。', 'music.loading': '音楽を読み込み中…',
-'watch.back': '← 戻る', 'watch.subscribe': '登録', 'watch.subscribed': '登録済み ✓',
-'watch.save': '🔖 保存', 'watch.saved': '🔖 保存済み', 'watch.download': '⬇ ダウンロード', 'watch.quality': '画質', 'watch.share': '↗ 共有',
-'watch.lyrics': '🎵 歌詞', 'watch.hideLyrics': '🎵 歌詞を隠す', 'watch.comments': 'コメント', 'watch.commentsFab': '💬 コメント',
+'watch.back': '戻る', 'watch.subscribe': '登録', 'watch.subscribed': '登録済み ✓',
+'watch.save': '保存', 'watch.saved': '保存済み', 'watch.download': 'ダウンロード', 'watch.quality': '画質', 'watch.share': '共有',
+'watch.lyrics': '歌詞', 'watch.hideLyrics': '歌詞を隠す', 'watch.comments': 'コメント', 'watch.commentsFab': 'コメント',
 'watch.moreVideos': '関連動画', 'watch.recommended': 'おすすめ動画', 'watch.more': '...もっと見る', 'watch.less': '...閉じる',
-'watch.loading': '読み込み中…', 'watch.noComments': 'コメントはまだありません。', 'watch.loadingComments': 'コメントを読み込み中…', 'watch.loadingRelated': 'おすすめを読み込み中…', 'related.hide': '✕ 非表示',
+'watch.loading': '読み込み中…', 'watch.noComments': 'コメントはまだありません。', 'watch.loadingComments': 'コメントを読み込み中…', 'watch.loadingRelated': 'おすすめを読み込み中…', 'related.hide': '非表示',
 'download.title': '動画をダウンロード', 'download.gettingLinks': 'ダウンロードリンクを取得中…',
-'download.go': '⬇ ダウンロード', 'download.copyLink': 'リンクをコピー', 'download.retry': '再試行',
+'download.go': 'ダウンロード', 'download.copyLink': 'リンクをコピー', 'download.retry': '再試行',
 'download.videoAudio': '動画 + 音声', 'download.videoOnly': '動画のみ（音声なし）',
 'download.sizeUnknown': 'サイズ不明',
 'quality.title': '画質', 'quality.auto': '自動', 'quality.audioOnly': '音声のみ',
@@ -1366,17 +1366,17 @@ I18N.ko = {
 'chip.all': '전체', 'chip.today': '오늘', 'chip.videos': '동영상', 'chip.subscribed': '구독 중', 'chip.live': '라이브',
 'music.search.placeholder': '노래, 아티스트 검색…',
 'music.chip.forYou': '맞춤 추천', 'music.chip.vietnamese': '베트남 음악', 'music.chip.usUk': 'US-UK', 'music.chip.kPop': 'K-Pop', 'music.chip.loFi': 'Lo-fi', 'music.chip.remix': '리믹스',
-'music.nowPlaying': '재생 중', 'music.lyrics': '🎵 가사', 'music.queue': '🎶 재생목록',
+'music.nowPlaying': '재생 중', 'music.lyrics': '가사', 'music.queue': '재생목록',
 'music.recent': '최근 재생', 'music.likedTracks': '좋아요한 곡', 'music.browse': '둘러보기',
 'music.noRecent': '최근 재생한 음악이 없습니다.', 'music.noLiked': '좋아요한 곡이 없습니다 — 곡의 ♥를 눌러보세요.',
 'music.noSongs': '노래를 찾을 수 없습니다 — 다른 검색어를 시도하세요.', 'music.loading': '음악을 불러오는 중…',
-'watch.back': '← 뒤로', 'watch.subscribe': '구독', 'watch.subscribed': '구독 중 ✓',
-'watch.save': '🔖 저장', 'watch.saved': '🔖 저장됨', 'watch.download': '⬇ 다운로드', 'watch.quality': '화질', 'watch.share': '↗ 공유',
-'watch.lyrics': '🎵 가사', 'watch.hideLyrics': '🎵 가사 숨기기', 'watch.comments': '댓글', 'watch.commentsFab': '💬 댓글',
+'watch.back': '뒤로', 'watch.subscribe': '구독', 'watch.subscribed': '구독 중 ✓',
+'watch.save': '저장', 'watch.saved': '저장됨', 'watch.download': '다운로드', 'watch.quality': '화질', 'watch.share': '공유',
+'watch.lyrics': '가사', 'watch.hideLyrics': '가사 숨기기', 'watch.comments': '댓글', 'watch.commentsFab': '댓글',
 'watch.moreVideos': '관련 동영상', 'watch.recommended': '추천 동영상', 'watch.more': '...더보기', 'watch.less': '...접기',
-'watch.loading': '불러오는 중…', 'watch.noComments': '댓글이 없습니다.', 'watch.loadingComments': '댓글을 불러오는 중…', 'watch.loadingRelated': '추천 동영상 불러오는 중…', 'related.hide': '✕ 숨기기',
+'watch.loading': '불러오는 중…', 'watch.noComments': '댓글이 없습니다.', 'watch.loadingComments': '댓글을 불러오는 중…', 'watch.loadingRelated': '추천 동영상 불러오는 중…', 'related.hide': '숨기기',
 'download.title': '동영상 다운로드', 'download.gettingLinks': '다운로드 링크를 가져오는 중…',
-'download.go': '⬇ 다운로드', 'download.copyLink': '링크 복사', 'download.retry': '다시 시도',
+'download.go': '다운로드', 'download.copyLink': '링크 복사', 'download.retry': '다시 시도',
 'download.videoAudio': '동영상 + 오디오', 'download.videoOnly': '동영상만 (소리 없음)',
 'download.sizeUnknown': '크기 알 수 없음',
 'quality.title': '화질', 'quality.auto': '자동', 'quality.audioOnly': '오디오만',
@@ -1477,6 +1477,45 @@ function t(key, vars) {
   if (vars) for (const [k, v] of Object.entries(vars)) s = s.split('{' + k + '}').join(String(v));
   return s;
 }
+// ---------- Bộ biểu tượng ----------
+// Bản web gốc và app Android đều dùng icon Material (SVG 24x24,
+// fill="currentColor", class "yt-icon") — không dùng emoji cho nút bấm.
+// Các path search/close/back/more-vert/like/dislike/share/heart lấy đúng
+// từ index.html bản web gốc; còn lại là path Material chuẩn cùng bộ.
+const ICONS = {
+  search: 'M20.87 20.17l-5.59-5.59C16.35 13.35 17 11.75 17 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.75 0 3.35-.65 4.58-1.71l5.59 5.59.7-.71zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z',
+  close: 'M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z',
+  back: 'M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z',
+  moreVert: 'M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z',
+  thumbUp: 'M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z',
+  thumbDown: 'M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z',
+  share: 'M14 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11z',
+  heart: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z',
+  heartOutline: 'M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C17.6 15.36 20 12.28 20 8.5 20 5.42 18.58 3 15.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z',
+  bookmark: 'M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z',
+  download: 'M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z',
+  settings: 'M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z',
+  musicNote: 'M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z',
+  play: 'M8 5v14l11-7z',
+  pause: 'M6 19h4V5H6v14zm8-14v14h4V5h-4z',
+  skipPrev: 'M6 6h2v12H6zm3.5 6l8.5 6V6z',
+  skipNext: 'M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z',
+  shuffle: 'M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z',
+  repeat: 'M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z',
+  volumeUp: 'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z',
+  volumeOff: 'M16.5 12c0-1.77-1.02-3.29-2.5-4.03v1.79l2.48 2.48c.01-.08.02-.16.02-.24zM19 12c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z',
+  refresh: 'M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z',
+  comment: 'M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z',
+  home: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
+  videoLibrary: 'M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z',
+  playlistPlay: 'M3 10h11v2H3v-2zm0-4h11v2H3V6zm0 8h7v2H3v-2zm13-1v8l6-4-6-4z',
+  account: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z',
+  globe: 'M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM13.34 14H10.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h2.68c.09.65.16 1.32.16 2 0 .68-.07 1.35-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z',
+  chevronDown: 'M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z',
+};
+function icon(name) {
+  return `<svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="${ICONS[name] || ''}" fill="currentColor"/></svg>`;
+}
 // formatCount: was called in 5 places but never defined (pre-existing bug —
 // opening a video would throw). Localised thousands separators.
 function formatCount(n, fb = '') {
@@ -1510,11 +1549,11 @@ function applyI18n() {
   renderChips();
   renderMusicChips();
   if (currentVideo) syncWatchButtons();
-  else { $('saveBtn').textContent = t('watch.save'); $('downloadBtn').textContent = t('watch.download'); $('shareBtn').textContent = t('watch.share'); refreshQualityLabel(); }
-  $('lyricsBtn').textContent = lyricsOpen ? t('watch.hideLyrics') : t('watch.lyrics');
-  $('mpLyricsBtn').textContent = t('watch.lyrics');
-  $('mpDownloadBtn').textContent = t('watch.download');
-  $('mpQueueBtn').textContent = t('music.queue');
+  else { $('saveBtn').innerHTML = icon('bookmark') + '<span>' + esc(t('watch.save')) + '</span>'; $('downloadBtn').innerHTML = icon('download') + '<span>' + esc(t('watch.download')) + '</span>'; $('shareBtn').innerHTML = icon('share') + '<span>' + esc(t('watch.share')) + '</span>'; refreshQualityLabel(); }
+  $('lyricsBtn').innerHTML = icon('musicNote') + '<span>' + esc(lyricsOpen ? t('watch.hideLyrics') : t('watch.lyrics')) + '</span>';
+  $('mpLyricsBtn').innerHTML = icon('musicNote') + '<span>' + esc(t('watch.lyrics')) + '</span>';
+  $('mpDownloadBtn').innerHTML = icon('download') + '<span>' + esc(t('watch.download')) + '</span>';
+  $('mpQueueBtn').innerHTML = icon('playlistPlay') + '<span>' + esc(t('music.queue')) + '</span>';
   if ($('moreBtn') && $('watchDesc').dataset.full !== undefined) {
     $('moreBtn').textContent = $('watchDesc').textContent === $('watchDesc').dataset.full ? t('watch.less') : t('watch.more');
   }
@@ -1759,9 +1798,9 @@ function cardHTML(v, opts) {
       <div class="card-text">
         <h3>${esc(v.title)}</h3>
         <div class="meta">${esc(channel)} • ${fmtViews(v.views)}${dateText ? ' • ' + esc(dateText) : ''}</div>
-        ${opts && opts.actions ? `<div class="card-actions"><button data-act="save">${esc(t('watch.save'))}</button><button data-act="share">${esc(t('watch.share'))}</button><button data-act="hide">${esc(t('related.hide'))}</button></div>` : ''}
+        ${opts && opts.actions ? `<div class="card-actions"><button data-act="save">${icon('bookmark')}<span>${esc(t('watch.save'))}</span></button><button data-act="share">${icon('share')}<span>${esc(t('watch.share'))}</span></button><button data-act="hide">${icon('close')}<span>${esc(t('related.hide'))}</span></button></div>` : ''}
       </div>
-      <button class="card-menu" data-menu="${esc(id)}" aria-label="More options">⋮</button>
+      <button class="card-menu" data-menu="${esc(id)}" aria-label="More options">${icon('moreVert')}</button>
     </div>
   </article>`;
 }
@@ -2121,7 +2160,7 @@ function syncWatchButtons() {
   $('dislikeBtn').classList.toggle('liked', disliked.has(id));
   $('dislikeCount').textContent = currentVideo.dislikes ? formatCount(currentVideo.dislikes, '') : '';
   $('saveBtn').classList.toggle('liked', !!savedVideos[id]);
-  $('saveBtn').textContent = savedVideos[id] ? t('watch.saved') : t('watch.save');
+  $('saveBtn').innerHTML = icon('bookmark') + '<span>' + esc(savedVideos[id] ? t('watch.saved') : t('watch.save')) + '</span>';
   $('subscribeBtn').textContent = subscribed.has(currentVideo.uploader || '')
     ? t('watch.subscribed') : t('watch.subscribe');
 }
@@ -2137,7 +2176,7 @@ async function loadComments(id) {
           <img src="${esc(av)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${esc(dicebearAvatar(c.author))}'">
           <div><div class="who">${esc(c.author || '@user')} <span>${esc(commentTimeText(c))}</span></div>
           <p>${esc(c.commentText)}</p>
-          <div class="likes">👍 ${c.likeCount ? formatCount(c.likeCount) : 0}</div></div>
+          <div class="likes">${icon('thumbUp')} ${c.likeCount ? formatCount(c.likeCount) : 0}</div></div>
         </div>`;
         }).join('')
       : `<p class="meta">${esc(t('watch.noComments'))}</p>`;
@@ -2372,8 +2411,8 @@ function hideMiniPlayer() {
   if (miniTimer) { clearInterval(miniTimer); miniTimer = null; }
 }
 function updateMiniPlayBtn() {
-  $('miniPlayBtn').textContent = playerPlaying ? '⏸' : '▶';
-  $('mpPlayBtn').textContent = playerPlaying ? '⏸' : '▶';
+  $('miniPlayBtn').innerHTML = icon(playerPlaying ? 'pause' : 'play');
+  $('mpPlayBtn').innerHTML = icon(playerPlaying ? 'pause' : 'play');
 }
 function updateMiniProgress() {
   if (!player || $('miniPlayer').hidden) return;
@@ -2449,7 +2488,7 @@ function openMusicPlayer(video, queue) {
   $('mpArt').src = `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
   $('mpTitle').textContent = v.title || '';
   $('mpArtist').textContent = v.uploaderName || v.uploader || '';
-  $('mpLikeBtn').textContent = liked.has(id) ? '♥' : '♡';
+  $('mpLikeBtn').innerHTML = icon(liked.has(id) ? 'heart' : 'heartOutline');
   $('mpLikeBtn').classList.toggle('liked', liked.has(id));
   $('mpCur').textContent = '0:00';
   $('mpDur').textContent = fmtDur(typeof v.duration === 'number' ? v.duration : parseDuration(v.duration));
@@ -2536,14 +2575,14 @@ function shortsSlideHTML(v) {
         </div>
         <h3 class="shorts-title-text">${esc(title)}</h3>
         <div class="shorts-meta">${shortsMetaText(v)}</div>
-        <div class="shorts-music">♫ Shorts</div>
+        <div class="shorts-music">${icon('musicNote')} Shorts</div>
       </div>
       <div class="shorts-rail">
-        <button class="rail-btn ${liked.has(id) ? 'liked' : ''}" data-action="like" data-id="${esc(id)}" title="${esc(t('shorts.like'))}">👍<span>${likes ? compactCount(likes) : t('shorts.like')}</span></button>
-        <button class="rail-btn ${disliked.has(id) ? 'liked' : ''}" data-action="dislike" data-id="${esc(id)}" title="${esc(t('shorts.dislike'))}">👎<span>${esc(t('shorts.dislike'))}</span></button>
-        <button class="rail-btn" data-action="comment" data-id="${esc(id)}" title="${esc(t('shorts.comments'))}">💬<span>${esc(t('shorts.comments'))}</span></button>
-        <button class="rail-btn" data-action="download" data-id="${esc(id)}" title="${esc(t('shorts.download'))}">⬇<span>${esc(t('shorts.download'))}</span></button>
-        <button class="rail-btn" data-action="share" data-id="${esc(id)}" title="${esc(t('shorts.share'))}">↗<span>${esc(t('shorts.share'))}</span></button>
+        <button class="rail-btn ${liked.has(id) ? 'liked' : ''}" data-action="like" data-id="${esc(id)}" title="${esc(t('shorts.like'))}">${icon('thumbUp')}<span>${likes ? compactCount(likes) : t('shorts.like')}</span></button>
+        <button class="rail-btn ${disliked.has(id) ? 'liked' : ''}" data-action="dislike" data-id="${esc(id)}" title="${esc(t('shorts.dislike'))}">${icon('thumbDown')}<span>${esc(t('shorts.dislike'))}</span></button>
+        <button class="rail-btn" data-action="comment" data-id="${esc(id)}" title="${esc(t('shorts.comments'))}">${icon('comment')}<span>${esc(t('shorts.comments'))}</span></button>
+        <button class="rail-btn" data-action="download" data-id="${esc(id)}" title="${esc(t('shorts.download'))}">${icon('download')}<span>${esc(t('shorts.download'))}</span></button>
+        <button class="rail-btn" data-action="share" data-id="${esc(id)}" title="${esc(t('shorts.share'))}">${icon('share')}<span>${esc(t('shorts.share'))}</span></button>
       </div>
     </div>
   </div>`;
@@ -2636,7 +2675,7 @@ function toggleShortsMute() {
     try { if (shortsMuted) p.mute(); else { p.unMute(); p.setVolume(80); } } catch { /* bỏ qua */ }
   }
   const topMute = $('shortsMuteTopBtn');
-  if (topMute) topMute.textContent = shortsMuted ? '🔇' : '🔊';
+  if (topMute) topMute.innerHTML = icon(shortsMuted ? 'volumeOff' : 'volumeUp');
   toast(shortsMuted ? t('shorts.muted') : t('shorts.unmuted'));
 }
 async function loadShorts(refresh = false) {
@@ -2730,7 +2769,7 @@ async function openShortsComments(id) {
           <img src="${esc(av)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.onerror=null;this.src='${esc(dicebearAvatar(c.author))}'">
           <div><div class="who">${esc(c.author || '@user')} <span>${esc(commentTimeText(c))}</span></div>
           <p>${esc(c.commentText)}</p>
-          <div class="likes">👍 ${c.likeCount ? formatCount(c.likeCount) : 0}</div></div>
+          <div class="likes">${icon('thumbUp')} ${c.likeCount ? formatCount(c.likeCount) : 0}</div></div>
         </div>`;
         }).join('')
       : `<p class="meta">${esc(t('watch.noComments'))}</p>`;
@@ -3059,7 +3098,7 @@ function refreshQualityLabel() {
       if (eff && QUALITY_LABEL[eff]) label = t('quality.subAuto', { q: QUALITY_LABEL[eff] });
     }
   } catch { /* bỏ qua */ }
-  btn.textContent = `⚙️ ${label}`;
+  btn.innerHTML = icon('settings') + '<span>' + esc(label) + '</span>';
 }
 function openQualitySheet() {
   const sheet = $('qualitySheet');
@@ -3166,7 +3205,7 @@ function openDownloadSheet(video) {
   $('downloadStatus').innerHTML = `<div class="spinner"></div>${esc(t('download.gettingLinks'))}`;
   $('downloadList').innerHTML = '';
   $('downloadGoBtn').disabled = true;
-  $('downloadGoBtn').textContent = t('download.go');
+  $('downloadGoBtn').innerHTML = icon('download') + '<span>' + esc(t('download.go')) + '</span>';
   $('downloadCopyBtn').hidden = true;
   $('downloadRetryBtn').hidden = true;
   $('downloadSheet').hidden = false;
@@ -3328,7 +3367,7 @@ function toggleLike(id, video) {
   store.set('disliked', [...disliked]);
   if (currentVideo && currentVideo.id === id) syncWatchButtons();
   const heart = $('mpLikeBtn');
-  if (heart) { heart.textContent = liked.has(id) ? '♥' : '♡'; heart.classList.toggle('liked', liked.has(id)); }
+  if (heart) { heart.innerHTML = icon(liked.has(id) ? 'heart' : 'heartOutline'); heart.classList.toggle('liked', liked.has(id)); }
 }
 function toggleDislike(id) {
   if (!id) return;

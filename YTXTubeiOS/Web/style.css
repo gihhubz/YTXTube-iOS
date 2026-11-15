@@ -381,7 +381,7 @@ body { padding-bottom: 92px; }
   font-weight: 700; box-shadow: var(--shadow);
 }
 @media (max-width: 899px) {
-  #watch.open ~ #commentsFab, #commentsFab.show { display: block; }
+  #watch.open ~ #commentsFab, #commentsFab.show { display: inline-flex; align-items: center; gap: 6px; }
   #watch.open .comments {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 70;
     max-height: 72vh; overflow-y: auto; padding: 16px;
@@ -706,3 +706,33 @@ body.theme-amoled { --text: #f1f1f1; --text-2: #999999; --bg: #000000; --glass: 
 .profile-signout-btn { width: 100%; height: 44px; border-radius: 12px; background: var(--chip); font-weight: 700; }
 .avatar-btn img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
 .avatar-btn .avatar-letter { width: 100%; height: 100%; display: grid; place-items: center; border-radius: 50%; color: #fff; font-weight: 800; font-size: 18px; }
+
+/* ---------- Biểu tượng SVG (giống bản web/app gốc) ---------- */
+/* Nút bấm dùng SVG Material 24x24 thay cho emoji. */
+.ic { width: 22px; height: 22px; flex: 0 0 auto; display: inline-block; vertical-align: middle; }
+.icon-btn .ic, .shorts-top-btn .ic, .avatar-btn .ic { width: 24px; height: 24px; }
+.search-box button, .music-search button { display: grid; place-items: center; }
+.search-box button .ic, .music-search button .ic { width: 22px; height: 22px; }
+.pill { display: inline-flex; align-items: center; gap: 6px; }
+.pill .ic { width: 18px; height: 18px; }
+.back-btn { display: inline-flex; align-items: center; gap: 6px; }
+.back-btn .ic { width: 18px; height: 18px; }
+.bottom-nav-btn .ic { width: 24px; height: 24px; }
+.logo .play .ic { width: 13px; height: 13px; }
+.rail-btn .ic { width: 28px; height: 28px; }
+.shorts-music .ic { width: 14px; height: 14px; vertical-align: -2px; }
+.shorts-comments-head > span { display: inline-flex; align-items: center; gap: 6px; }
+.shorts-comments-head .ic { width: 18px; height: 18px; }
+.comment .likes .ic { width: 14px; height: 14px; vertical-align: -2px; }
+.card-menu .ic { width: 20px; height: 20px; }
+.card-actions button { display: inline-flex; align-items: center; gap: 4px; }
+.card-actions .ic { width: 14px; height: 14px; }
+.mp-controls .ic { width: 28px; height: 28px; }
+.mp-play .ic { width: 34px; height: 34px; }
+.mp-heart .ic { width: 26px; height: 26px; }
+.mini-player .ic { width: 20px; height: 20px; }
+.lyrics-lang { display: inline-flex; align-items: center; gap: 5px; }
+.lyrics-lang .ic { width: 14px; height: 14px; }
+#commentsFab .ic { width: 18px; height: 18px; }
+.dl-go { display: flex; align-items: center; justify-content: center; gap: 6px; }
+.dl-go .ic { width: 18px; height: 18px; }

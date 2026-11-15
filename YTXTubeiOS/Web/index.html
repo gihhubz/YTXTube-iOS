@@ -12,18 +12,18 @@
 <div class="topbar">
 <header>
   <a class="logo" href="#" id="homeBtn" aria-label="Home">
-    <span class="play">▶</span> YTXTube
+    <span class="play"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span> YTXTube
   </a>
   <span class="header-spacer"></span>
-  <button class="icon-btn" id="searchToggleBtn" title="Search" aria-label="Search" data-i18n-title="common.search" data-i18n-aria="common.search">🔍</button>
-  <button class="icon-btn avatar-btn" id="historyBtn" title="Sign in" aria-label="Sign in" data-i18n-title="profile.title" data-i18n-aria="profile.title">👤</button>
-  <button class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings" data-i18n-title="common.settings" data-i18n-aria="common.settings">⚙️</button>
+  <button class="icon-btn" id="searchToggleBtn" title="Search" aria-label="Search" data-i18n-title="common.search" data-i18n-aria="common.search"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20.87 20.17l-5.59-5.59C16.35 13.35 17 11.75 17 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.75 0 3.35-.65 4.58-1.71l5.59 5.59.7-.71zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" fill="currentColor"/></svg></button>
+  <button class="icon-btn avatar-btn" id="historyBtn" title="Sign in" aria-label="Sign in" data-i18n-title="profile.title" data-i18n-aria="profile.title"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" fill="currentColor"/></svg></button>
+  <button class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings" data-i18n-title="common.settings" data-i18n-aria="common.settings"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" fill="currentColor"/></svg></button>
 </header>
 
 <div class="search-row" id="searchRow" hidden>
   <div class="search-box">
     <input id="searchInput" type="search" placeholder="Search videos, channels…" autocomplete="off" enterkeyhint="search" data-i18n-placeholder="search.placeholder">
-    <button id="searchBtn" aria-label="Search">🔍</button>
+    <button id="searchBtn" aria-label="Search"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20.87 20.17l-5.59-5.59C16.35 13.35 17 11.75 17 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.75 0 3.35-.65 4.58-1.71l5.59 5.59.7-.71zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" fill="currentColor"/></svg></button>
   </div>
 </div>
 
@@ -47,7 +47,7 @@
        when style.css fails to load — e.g. opening index.html directly
        from a file viewer instead of over HTTP. JS removes it on open. -->
   <section id="watch" hidden>
-    <button class="back-btn" id="backBtn" data-i18n="watch.back">← Back</button>
+    <button class="back-btn" id="backBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/></svg><span data-i18n="watch.back">Back</span></button>
     <div class="watch-layout">
       <div class="watch-main">
         <div class="player-wrap" id="playerWrap"></div>
@@ -72,23 +72,23 @@
           <button class="subscribe-btn" id="subscribeBtn">Subscribe</button>
         </div>
         <div class="actions">
-          <button class="pill" id="likeBtn">👍 <span id="likeCount"></span></button>
-          <button class="pill" id="dislikeBtn">👎 <span id="dislikeCount"></span></button>
-          <button class="pill" id="saveBtn" data-i18n="watch.save">🔖 Save</button>
-          <button class="pill" id="downloadBtn" data-i18n="watch.download">⬇ Download</button>
-          <button class="pill" id="qualityBtn" title="Playback quality" data-i18n-title="watch.quality">⚙️ Auto</button>
-          <button class="pill" id="shareBtn" data-i18n="watch.share">↗ Share</button>
+          <button class="pill" id="likeBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" fill="currentColor"/></svg><span id="likeCount"></span></button>
+          <button class="pill" id="dislikeBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z" fill="currentColor"/></svg><span id="dislikeCount"></span></button>
+          <button class="pill" id="saveBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z" fill="currentColor"/></svg><span data-i18n="watch.save">Save</span></button>
+          <button class="pill" id="downloadBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" fill="currentColor"/></svg><span data-i18n="watch.download">Download</span></button>
+          <button class="pill" id="qualityBtn" title="Playback quality" data-i18n-title="watch.quality"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z" fill="currentColor"/></svg><span>Auto</span></button>
+          <button class="pill" id="shareBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M14 9V5l7 7-7 7v-4.1c-5 0-8.5 1.6-11 5.1 1-5 4-10 11-11z" fill="currentColor"/></svg><span data-i18n="watch.share">Share</span></button>
         </div>
         <div class="desc" id="watchDesc"></div>
         <button class="more-btn" id="moreBtn" hidden>...more</button>
         <div class="lyrics-bar">
-          <button class="pill" id="lyricsBtn" data-i18n="watch.lyrics">🎵 Lyrics</button>
+          <button class="pill" id="lyricsBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/></svg><span data-i18n="watch.lyrics">Lyrics</span></button>
           <span class="lyrics-hint" id="lyricsHint"></span>
         </div>
         <div class="lyrics-panel" id="lyricsPanel" hidden>
           <div class="lyrics-head">
             <span class="lyrics-title">LYRICS</span>
-            <span class="lyrics-lang">🌐 EN</span>
+            <span class="lyrics-lang"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM13.34 14H10.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h2.68c.09.65.16 1.32.16 2 0 .68-.07 1.35-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z" fill="currentColor"/></svg> EN</span>
             <button id="lyricsCloseBtn" aria-label="Close lyrics">✕</button>
           </div>
           <div class="lyrics-status" id="lyricsStatus"></div>
@@ -110,36 +110,36 @@
   <!-- Music player: Now Playing (Android screenshot 04-music-player) -->
   <section id="music-player-view" aria-label="Now Playing" hidden>
     <div class="mp-head">
-      <button class="icon-btn" id="mpBackBtn" aria-label="Back">⌄</button>
+      <button class="icon-btn" id="mpBackBtn" aria-label="Back"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z" fill="currentColor"/></svg></button>
       <div class="mp-head-titles"><span class="mp-kicker">YTX MUSIC</span><span class="mp-now" data-i18n="music.nowPlaying">Now Playing</span></div>
-      <button class="icon-btn" id="mpMenuBtn" aria-label="More">⋮</button>
+      <button class="icon-btn" id="mpMenuBtn" aria-label="More"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="currentColor"/></svg></button>
     </div>
     <div class="mp-art"><img id="mpArt" alt="" referrerpolicy="no-referrer"></div>
     <div class="mp-track">
       <div class="mp-track-text"><h1 id="mpTitle"></h1><div class="mp-artist" id="mpArtist"></div></div>
-      <button class="icon-btn mp-heart" id="mpLikeBtn" aria-label="Like">♡</button>
+      <button class="icon-btn mp-heart" id="mpLikeBtn" aria-label="Like"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C17.6 15.36 20 12.28 20 8.5 20 5.42 18.58 3 15.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z" fill="currentColor"/></svg></button>
     </div>
     <div class="mp-seek">
       <input type="range" id="mpSeek" min="0" max="100" value="0" step="0.1" aria-label="Seek">
       <div class="mp-times"><span id="mpCur">0:00</span><span id="mpDur">0:00</span></div>
     </div>
     <div class="mp-controls">
-      <button id="mpShuffleBtn" aria-label="Shuffle">🔀</button>
-      <button id="mpPrevBtn" aria-label="Previous">⏮</button>
-      <button id="mpPlayBtn" class="mp-play" aria-label="Play or pause">⏸</button>
-      <button id="mpNextBtn" aria-label="Next">⏭</button>
-      <button id="mpRepeatBtn" aria-label="Repeat">🔁</button>
+      <button id="mpShuffleBtn" aria-label="Shuffle"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z" fill="currentColor"/></svg></button>
+      <button id="mpPrevBtn" aria-label="Previous"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z" fill="currentColor"/></svg></button>
+      <button id="mpPlayBtn" class="mp-play" aria-label="Play or pause"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="currentColor"/></svg></button>
+      <button id="mpNextBtn" aria-label="Next"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" fill="currentColor"/></svg></button>
+      <button id="mpRepeatBtn" aria-label="Repeat"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z" fill="currentColor"/></svg></button>
     </div>
     <div class="mp-foot">
       <span class="mp-quality" data-i18n="music.hqAudio">HQ AUDIO · 256 KBPS AAC</span>
-      <button class="pill" id="mpDownloadBtn" data-i18n="watch.download">⬇ Download</button>
-      <button class="pill" id="mpLyricsBtn" data-i18n="watch.lyrics">🎵 Lyrics</button>
-      <button class="pill" id="mpQueueBtn" data-i18n="music.queue">🎶 Queue</button>
+      <button class="pill" id="mpDownloadBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" fill="currentColor"/></svg><span data-i18n="watch.download">Download</span></button>
+      <button class="pill" id="mpLyricsBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/></svg><span data-i18n="watch.lyrics">Lyrics</span></button>
+      <button class="pill" id="mpQueueBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M3 10h11v2H3v-2zm0-4h11v2H3V6zm0 8h7v2H3v-2zm13-1v8l6-4-6-4z" fill="currentColor"/></svg><span data-i18n="music.queue">Queue</span></button>
     </div>
     <div class="mp-lyrics-card" id="mpLyricsCard" hidden>
       <div class="lyrics-head">
         <span class="lyrics-title">LYRICS</span>
-        <span class="lyrics-lang">🌐 EN</span>
+        <span class="lyrics-lang"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm6.93 6h-2.95c-.32-1.25-.78-2.45-1.38-3.56 1.84.63 3.37 1.91 4.33 3.56zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2 0 .68.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56-1.84-.63-3.37-1.9-4.33-3.56zm2.95-8H5.08c.96-1.66 2.49-2.93 4.33-3.56C8.81 5.55 8.35 6.75 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM13.34 14H10.66c-.09-.66-.16-1.32-.16-2 0-.68.07-1.35.16-2h2.68c.09.65.16 1.32.16 2 0 .68-.07 1.35-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95c-.96 1.65-2.49 2.93-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2 0-.68-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z" fill="currentColor"/></svg> EN</span>
         <button id="mpLyricsCloseBtn" aria-label="Close lyrics">✕</button>
       </div>
       <div class="lyrics-status" id="mpLyricsStatus"></div>
@@ -153,7 +153,7 @@
     <h1 class="section-title">YTX Music</h1>
     <div class="music-search">
       <input id="musicSearchInput" type="search" placeholder="Search songs, artists…" autocomplete="off" enterkeyhint="search" data-i18n-placeholder="music.search.placeholder">
-      <button id="musicSearchBtn" aria-label="Search music">🔍</button>
+      <button id="musicSearchBtn" aria-label="Search music"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20.87 20.17l-5.59-5.59C16.35 13.35 17 11.75 17 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.75 0 3.35-.65 4.58-1.71l5.59 5.59.7-.71zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" fill="currentColor"/></svg></button>
     </div>
     <nav class="music-chips" id="musicChips" aria-label="Music genres"></nav>
     <h2 class="music-shelf-title" data-i18n="music.recent">Recently played</h2>
@@ -202,7 +202,7 @@
   <!-- Settings (Bước 5, Android screenshot 08-settings): Appearance,
        Playback, SponsorBlock, Data & Storage, About -->
   <section id="settings-view" aria-label="Settings" hidden>
-    <button class="back-btn" id="settingsBackBtn" data-i18n="watch.back">← Back</button>
+    <button class="back-btn" id="settingsBackBtn"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/></svg><span data-i18n="watch.back">Back</span></button>
     <h1 class="section-title" data-i18n="settings.title">Settings</h1>
     <h2 class="settings-section-title" data-i18n="settings.appearance">Appearance</h2>
     <div class="settings-card">
@@ -239,13 +239,13 @@
   <!-- Shorts (Bước 2): full-screen vertical feed — top bar like Android (screenshot 02-shorts) -->
   <section id="shorts-view" aria-label="Shorts" hidden>
     <div class="shorts-top">
-      <button class="shorts-top-btn" id="shortsBackBtn" aria-label="Back">←</button>
+      <button class="shorts-top-btn" id="shortsBackBtn" aria-label="Back"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" fill="currentColor"/></svg></button>
       <span class="shorts-title" data-i18n="shorts.title">Shorts</span>
       <span class="shorts-top-right">
         <button class="shorts-top-btn shorts-quality-btn" id="shortsQualityBtn" aria-label="Quality">HD</button>
-        <button class="shorts-top-btn" id="shortsMuteTopBtn" aria-label="Sound">🔊</button>
-        <button class="shorts-top-btn" id="shortsRefreshBtn" aria-label="Refresh">🔄</button>
-        <button class="shorts-top-btn" id="shortsSearchBtn" aria-label="Search">🔍</button>
+        <button class="shorts-top-btn" id="shortsMuteTopBtn" aria-label="Sound"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" fill="currentColor"/></svg></button>
+        <button class="shorts-top-btn" id="shortsRefreshBtn" aria-label="Refresh"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" fill="currentColor"/></svg></button>
+        <button class="shorts-top-btn" id="shortsSearchBtn" aria-label="Search"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20.87 20.17l-5.59-5.59C16.35 13.35 17 11.75 17 10c0-3.87-3.13-7-7-7s-7 3.13-7 7 3.13 7 7 7c1.75 0 3.35-.65 4.58-1.71l5.59 5.59.7-.71zM10 16c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z" fill="currentColor"/></svg></button>
       </span>
     </div>
     <div class="shorts-feed" id="shortsFeed"></div>
@@ -257,7 +257,7 @@
 <!-- Shorts comments drawer (same Piped data as the watch view) -->
 <div id="shortsCommentsDrawer" class="shorts-comments" hidden>
   <div class="shorts-comments-head">
-    <span>💬 <span data-i18n="watch.comments">Comments</span></span>
+    <span><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="currentColor"/></svg> <span data-i18n="watch.comments">Comments</span></span>
     <button id="shortsCommentsClose" aria-label="Close comments">✕</button>
   </div>
   <div id="shortsCommentsList"></div>
@@ -267,19 +267,19 @@
 <div id="miniPlayer" class="mini-player" hidden>
   <img id="miniThumb" alt="" referrerpolicy="no-referrer">
   <div class="mini-info"><div id="miniTitle"></div><div id="miniArtist"></div></div>
-  <button id="miniPlayBtn" aria-label="Play or pause">⏸</button>
-  <button id="miniNextBtn" aria-label="Next">⏭</button>
+  <button id="miniPlayBtn" aria-label="Play or pause"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" fill="currentColor"/></svg></button>
+  <button id="miniNextBtn" aria-label="Next"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z" fill="currentColor"/></svg></button>
   <button id="miniCloseBtn" aria-label="Close">✕</button>
   <div class="mini-progress"><div id="miniProgress"></div></div>
 </div>
 
 <!-- Bottom bar: Android v2.2.0 order Home | Music | Shorts | Library | Saved -->
 <nav class="bottom-nav" id="bottomNav" aria-label="Main navigation">
-  <button id="homeNavBtn" class="bottom-nav-btn active" aria-label="Home" data-i18n-aria="nav.home">🏠<span data-i18n="nav.home">Home</span></button>
-  <button id="musicNavBtn" class="bottom-nav-btn" aria-label="Music" data-i18n-aria="nav.music">🎵<span data-i18n="nav.music">Music</span></button>
-  <button id="shortsNavBtn" class="bottom-nav-btn" aria-label="Shorts" data-i18n-aria="nav.shorts">▶<span data-i18n="nav.shorts">Shorts</span></button>
-  <button id="libraryNavBtn" class="bottom-nav-btn" aria-label="Library" data-i18n-aria="nav.library">📚<span data-i18n="nav.library">Library</span></button>
-  <button id="savedNavBtn" class="bottom-nav-btn" aria-label="Saved" data-i18n-aria="nav.saved">⬇<span data-i18n="nav.saved">Saved</span></button>
+  <button id="homeNavBtn" class="bottom-nav-btn active" aria-label="Home" data-i18n-aria="nav.home"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" fill="currentColor"/></svg><span data-i18n="nav.home">Home</span></button>
+  <button id="musicNavBtn" class="bottom-nav-btn" aria-label="Music" data-i18n-aria="nav.music"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" fill="currentColor"/></svg><span data-i18n="nav.music">Music</span></button>
+  <button id="shortsNavBtn" class="bottom-nav-btn" aria-label="Shorts" data-i18n-aria="nav.shorts"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M8 5v14l11-7z" fill="currentColor"/></svg><span data-i18n="nav.shorts">Shorts</span></button>
+  <button id="libraryNavBtn" class="bottom-nav-btn" aria-label="Library" data-i18n-aria="nav.library"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8 12.5v-9l6 4.5-6 4.5z" fill="currentColor"/></svg><span data-i18n="nav.library">Library</span></button>
+  <button id="savedNavBtn" class="bottom-nav-btn" aria-label="Saved" data-i18n-aria="nav.saved"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z" fill="currentColor"/></svg><span data-i18n="nav.saved">Saved</span></button>
 </nav>
 
 <!-- Download sheet (Android screenshot 06-download-video) -->
@@ -299,7 +299,7 @@
   <div class="dl-status" id="downloadStatus"></div>
   <div id="downloadList"></div>
   <p class="meta dl-note" data-i18n="download.iosNote">On iOS the file opens in a new tab — long-press the video and choose “Save to Files”. Video and audio are separate streams on YouTube, so high-quality video may have no sound.</p>
-  <button class="dl-go" id="downloadGoBtn" disabled>⬇ Download</button>
+  <button class="dl-go" id="downloadGoBtn" disabled><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z" fill="currentColor"/></svg><span>Download</span></button>
   <button class="pill dl-copy" id="downloadCopyBtn" hidden data-i18n="download.copyLink">Copy link</button>
   <button class="pill dl-copy" id="downloadRetryBtn" hidden data-i18n="download.retry">Try again</button>
 </div>
@@ -346,7 +346,7 @@
 </div>
 
 <div id="toast" role="status"></div>
-<button id="commentsFab" data-i18n="watch.commentsFab">💬 Comments</button>
+<button id="commentsFab"><svg viewBox="0 0 24 24" class="ic" aria-hidden="true"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" fill="currentColor"/></svg><span data-i18n="watch.commentsFab">Comments</span></button>
 <noscript><p style="padding:16px">YTXTube needs JavaScript enabled. Open this page over HTTP (not as a single file) so style.css and app.js load with it.</p></noscript>
 <script src="https://www.youtube.com/iframe_api"></script>
 <script src="app.js"></script>
