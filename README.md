@@ -477,6 +477,24 @@ cộng đồng — video ít người xem có thể không có segment nào.
   ký ✓", ♥ trong câu hướng dẫn, và avatar thú (🦊 🐼…) do người dùng
   tự chọn — đó không phải biểu tượng nút bấm.
 
+## Thanh dưới gọn như app gốc + kệ Shorts đầu Home (sửa, 2026-11-15)
+
+- Đối chiếu ảnh Home của app Android gốc (`docs/screenshots/01-home.webp`):
+  thanh dưới của họ là viên thuốc nổi gọn — rộng khoảng 82% màn hình,
+  cao ~56px, icon ~20px, mục đang chọn chỉ có nền pill mờ nhẹ. Trước
+  đây thanh của bản này rộng 94% màn hình (368px), cao 64px, icon 24px
+  nên nhìn thưa và to. Giờ: rộng tối đa 330px (`min(330px, 100vw-56px)`),
+  cao 56px, icon 20px, cách đáy 8px — giống gốc. Nền pill của mục đang
+  chọn đã mờ nhẹ sẵn (`rgba(255,255,255,.18)` ở dark mode) nên giữ nguyên.
+- Kệ Shorts ở đầu trang Home (kiểu kệ Shorts của YouTube): tiêu đề
+  Shorts (icon play đỏ) + hàng ngang cuộn được, mỗi thẻ là ảnh 9:16
+  với tiêu đề và lượt xem (tối đa 10 thẻ, lấy từ cùng danh sách Shorts
+  của trình Shorts). Bấm (hoặc Enter/Space) vào một thẻ thì mở trình
+  Shorts ngay tại video đó (`openShortsAt` đưa video lên đầu danh sách
+  rồi mở). Kệ chỉ hiện trên feed Home mặc định — ẩn khi tìm kiếm, xem
+  kênh, hoặc lọc chip khác. Dữ liệu tải cùng lúc với feed Home; nếu
+  Piped trả quá ít thì dùng video dự phòng như trình Shorts.
+
 ## Chưa có (không port từ bản Android)
 
 PoToken, nhiều tài khoản YouTube, chế độ TV. Những
