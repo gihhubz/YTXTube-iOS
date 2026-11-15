@@ -1,13 +1,32 @@
 # YTXTube iOS
 
-Bản viết lại cho iPhone/iPad của **YTXTube** — app xem YouTube + YouTube Music
-nhẹ, không quảng cáo, giao diện Liquid Glass. Viết lại từ đầu (clean-room):
-không copy code Android (Kotlin/Jetpack Compose) của bản gốc, chỉ giữ lại
-ý tưởng — xem YouTube qua API công khai + trình phát embed.
+**YTXTube** bản gốc chạy trên iPhone/iPad: code web gốc của YTXTube
+(`web/` trong repo Koustubh12345/YTXTube, GPL-3.0) giữ nguyên y hệt,
+chỉ thêm vỏ iOS (Swift + WKWebView) để chạy thành app — không viết lại
+code web. Xem YouTube qua API công khai Piped + trình phát embed
+youtube-nocookie.
+
+> Bản viết lại trước đây (feed + Shorts + nhạc/lời + tải xuống +
+> SponsorBlock + đăng nhập/đồng bộ, tới run #14) được giữ trong lịch
+> sử git và `~/workspace/ytxtube-ios-rewrite-backup/` — cần thì quay lại được.
 
 > ⚠️ **Chưa có file .ipa sẵn.** Máy Linux này không có Xcode/macOS nên
 > **không biên dịch được IPA tại đây và chưa test trên iPhone thật**.
 > Làm theo mục "Cách lấy file IPA" bên dưới để build.
+
+## Code web gốc, giữ nguyên (từ 2026-11-15)
+
+- `YTXTubeiOS/Web/` = đúng 5 file trong `web/` của repo gốc:
+  `index.html`, `app.js`, `style.css`, `icon.png`, `upi_qr.png` — tải
+  nguyên văn, không sửa một dòng. Giấy phép GPL-3.0, tác giả Koustubh12345.
+- Phần thêm duy nhất cho iOS: vỏ Swift (`ContentView.swift`) — WKWebView
+  chạy file `Web/index.html` trong app, phát inline, PiP, chạy nền, link
+  ngoài mở bằng Safari. Workflow build IPA không đổi.
+- Bản web gốc có: feed trending, tìm kiếm, chip danh mục, xem video,
+  bình luận, video liên quan, lịch sử + gợi ý theo sở thích (localStorage),
+  sáng/tối theo hệ thống. Bản web gốc KHÔNG có: Shorts, nhạc + lời đồng bộ,
+  tải video, SponsorBlock, đăng nhập/đồng bộ, đa ngôn ngữ — những tính năng
+  này chỉ có ở bản viết lại cũ (xem ghi chú ở trên).
 
 ## Mục tiêu: giống hệt bản Android v2.2.0
 
