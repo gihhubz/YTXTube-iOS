@@ -2756,16 +2756,20 @@ function renderHomeShortsShelf() {
   if (!shelf || !row) return;
   const items = shortsList.slice(0, 10);
   if (!items.length) { shelf.hidden = true; return; }
-  shelf.hidden = false;
-  row.innerHTML = items.map((v) => {
+  // Dựng HTML xong mới hiện kệ: nếu vẽ thẻ lỗi thì kệ vẫn ẩn, không để
+  // lại tiêu đề trơ trọi trên đầu feed (lỗi formatViews từng gây ra đúng
+  // tình trạng đó — tiêu đề hiện, hàng thẻ trống).
+  const html = items.map((v) => {
     const id = videoId(v);
     const thumb = v.thumbnail || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
     return `<div class="shorts-shelf-card" data-shorts-id="${esc(id)}" role="button" tabindex="0">
       <img src="${esc(thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer">
       <div class="shorts-shelf-title-text">${esc(v.title || 'Shorts')}</div>
-      <div class="shorts-shelf-meta">${v.views ? esc(formatViews(v.views)) : ''}</div>
+      <div class="shorts-shelf-meta">${v.views ? esc(fmtViews(v.views)) : ''}</div>
     </div>`;
   }).join('');
+  row.innerHTML = html;
+  shelf.hidden = false;
 }
 // Chỉ hiện kệ trên feed Home mặc định (không hiện khi tìm kiếm, xem kênh
 // hay lọc chip khác); chưa có dữ liệu thì tải Shorts rồi vẽ kệ khi xong.
