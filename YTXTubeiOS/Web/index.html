@@ -9,13 +9,14 @@
 </head>
 <body>
 
+<div class="topbar">
 <header>
   <a class="logo" href="#" id="homeBtn" aria-label="Home">
     <span class="play">▶</span> YTXTube
   </a>
   <span class="header-spacer"></span>
   <button class="icon-btn" id="searchToggleBtn" title="Search" aria-label="Search" data-i18n-title="common.search" data-i18n-aria="common.search">🔍</button>
-  <button class="icon-btn avatar-btn" id="historyBtn" title="Library" aria-label="Library" data-i18n-title="common.library" data-i18n-aria="common.library">👤</button>
+  <button class="icon-btn avatar-btn" id="historyBtn" title="Sign in" aria-label="Sign in" data-i18n-title="profile.title" data-i18n-aria="profile.title">👤</button>
   <button class="icon-btn" id="settingsBtn" title="Settings" aria-label="Settings" data-i18n-title="common.settings" data-i18n-aria="common.settings">⚙️</button>
 </header>
 
@@ -27,6 +28,7 @@
 </div>
 
 <nav class="chips" id="chips" aria-label="Categories"></nav>
+</div>
 
 <main>
   <!-- Home: trending feed (Android HomeFilter chips: All / Today / Videos / Subscribed / Live) -->
@@ -49,6 +51,14 @@
     <div class="watch-layout">
       <div>
         <div class="player-wrap" id="playerWrap"></div>
+        <div class="watch-time" id="watchTime" hidden>
+          <span class="watch-live-badge" id="watchLiveBadge" hidden data-i18n="common.live">Live</span>
+          <span id="watchCur">0:00</span>
+          <div class="watch-progress"><div id="watchProgressBar"></div></div>
+          <span id="watchDur"></span>
+          <button class="pill watch-back-live" id="watchBackToLiveBtn" hidden data-i18n="watch.backToLive">Back to live</button>
+        </div>
+        <div class="watch-live-ended" id="watchLiveEnded" hidden data-i18n="watch.liveEnded">This live stream has ended.</div>
         <h1 class="watch-title" id="watchTitle"></h1>
         <div class="watch-meta" id="watchMeta"></div>
         <div class="watch-row">
@@ -211,9 +221,12 @@
     </div>
     <h2 class="settings-section-title" data-i18n="settings.dataStorage">Data &amp; Storage</h2>
     <div class="settings-card">
+      <div class="settings-row"><span><span class="settings-title" data-i18n="sync.title">Cloud sync</span><span class="settings-sub" id="cloudSyncInfo">…</span></span></div>
+      <div class="settings-row"><span><span class="settings-title" data-i18n="sync.exportImport">Move data to another device</span><span class="settings-sub" data-i18n="sync.exportImportSub">Export a JSON file, then import it on the other device.</span></span><span style="display:flex;gap:8px"><button class="pill" id="exportDataBtn" data-i18n="sync.export">Export data</button><button class="pill" id="importDataBtn" data-i18n="sync.import">Import data</button></span></div>
       <div class="settings-row"><span><span class="settings-title" data-i18n="settings.storageUsage">Storage usage</span><span class="settings-sub" id="settingsStorageInfo">Checking storage…</span></span></div>
       <div class="settings-row"><span><span class="settings-title" data-i18n="settings.clearCache">Clear cache</span><span class="settings-sub" data-i18n="settings.clearCacheSub">Removes history, preferences and seen Shorts — not your likes, saves, downloads or subscriptions</span></span><button class="pill" id="settingsClearCacheBtn" data-i18n="library.clearCache">Clear cache</button></div>
     </div>
+    <input type="file" id="importFileInput" accept=".json,application/json" hidden>
     <h2 class="settings-section-title" data-i18n="settings.about">About</h2>
     <div class="settings-card">
       <div class="settings-row"><span><span class="settings-title" data-i18n="settings.version">Version</span><span class="settings-sub" data-i18n="settings.versionSub">YTXTube iOS v2.2.0 — clean-room port of Android YTXTube v2.2.0 (GPL-3.0)</span></span></div>
@@ -299,6 +312,35 @@
   <p class="meta" id="qualityAutoNote"></p>
   <div id="qualityList"></div>
   <p class="meta dl-note" data-i18n="quality.note">Your choice is saved on this device and applied to every video and Short. HDR depends on the video and the device.</p>
+</div>
+
+<!-- Profile / sign-in sheet (Google + Email — no Apple ID) -->
+<div id="profileSheet" class="sheet" hidden>
+  <div class="sheet-handle"></div>
+  <div class="sheet-head">
+    <h2 class="sheet-title" id="profileSheetTitle" data-i18n="profile.title">Sign in</h2>
+    <button class="sheet-close" id="profileCloseBtn" aria-label="Close">✕</button>
+  </div>
+  <!-- Logged out: Google + Email -->
+  <div id="profileSignInView">
+    <div id="googleBtnWrap"></div>
+    <button class="profile-google-btn" id="googleSignInBtn"><span class="google-g" aria-hidden="true">G</span> <span data-i18n="profile.googleButton">Continue with Google</span></button>
+    <div class="profile-divider"><span data-i18n="profile.or">or</span></div>
+    <div class="profile-field"><label for="profileEmailInput" data-i18n="profile.emailLabel">Email</label><input id="profileEmailInput" type="email" placeholder="you@example.com" autocomplete="email" data-i18n-placeholder="profile.emailPlaceholder"></div>
+    <div class="profile-field"><label for="profileNameInput" data-i18n="profile.nameLabel">Display name</label><input id="profileNameInput" type="text" placeholder="Your name…" autocomplete="nickname" data-i18n-placeholder="profile.namePlaceholder"></div>
+    <div class="profile-field"><label data-i18n="profile.avatarLabel">Choose an avatar</label><div class="profile-avatars" id="profileAvatarPicker"></div></div>
+    <p class="meta" data-i18n="profile.localNote">Your Email profile is stored on this device only — it is not a real Google/YouTube account.</p>
+    <button class="profile-signin-btn" id="profileSignInBtn" data-i18n="profile.signIn">Sign in</button>
+  </div>
+  <!-- Logged in: profile -->
+  <div id="profileView" class="profile-view" hidden>
+    <div class="profile-avatar-big" id="profileAvatarBig"></div>
+    <div class="profile-name" id="profileName"></div>
+    <div class="profile-email" id="profileEmail"></div>
+    <span class="profile-method" id="profileMethod"></span>
+    <button class="profile-signout-btn" id="profileSignOutBtn" data-i18n="profile.signOut">Sign out</button>
+    <p class="meta" id="profileDataNote"></p>
+  </div>
 </div>
 
 <div id="toast" role="status"></div>

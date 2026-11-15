@@ -9,8 +9,11 @@
    vì sao dùng nocookie + enablejsapi + playsinline trên iOS).
    UI strings are multilingual (I18N dict below: en + vi complete, es/zh/ja/ko
    primary UI with English fallback); English is the fallback language.
-   KHÔNG có đăng nhập, KHÔNG chặn quảng cáo
-   bằng thủ thuật — quảng cáo không xuất hiện vì video chạy qua embed
+   Đăng nhập: Email (hồ sơ local trên máy) + Google thật qua Google Identity
+   Services (cần GOOGLE_CLIENT_ID — xem README; KHÔNG có Apple ID).
+   Đồng bộ cloud: Firebase (FIREBASE_CONFIG — xem README), tắt khi trống.
+   KHÔNG chặn quảng cáo bằng thủ thuật — quảng cáo không xuất hiện vì video
+   chạy qua embed
    nocookie, không qua trang youtube.com. Tải video (Bước 4) chạy theo
    cách iOS cho phép: mở link stream trong tab mới rồi lưu vào Files. */
 
@@ -23,6 +26,18 @@ const INSTANCES = [
 ];
 const EMBED = (id) =>
   `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&enablejsapi=1&rel=0&playsinline=1`;
+
+// ---------- Cấu hình đăng nhập + đồng bộ cloud (điền key thật vào đây) ----------
+// Google Identity Services: tạo OAuth client ID loại Web tại
+// https://console.cloud.google.com/apis/credentials (xem README mục Đăng nhập).
+// Để trống = nút Google chỉ báo chưa cấu hình, KHÔNG giả vờ đăng nhập thành công.
+// Firebase (gói miễn phí Spark): tạo project tại https://console.firebase.google.com
+// (xem README mục Đồng bộ cloud). Để trống = đồng bộ cloud TẮT, app chạy hoàn
+// toàn bằng dữ liệu local theo tài khoản + xuất/nhập file. KHÔNG bịa config/key giả.
+// Trong WKWebView của app đã cài, popup Google có thể cần xử lý thêm phía Swift
+// (chưa có) — Google chắc chắn chạy trên link web (Safari).
+const GOOGLE_CLIENT_ID = '';
+const FIREBASE_CONFIG = {}; // {apiKey, authDomain, projectId, storageBucket, messagingSenderId, appId}
 
 // Danh sách dự phòng (chỉ dùng khi cả 2 máy chủ Piped đều lỗi).
 // 6 video khác với bản gốc, để trang không trống.
@@ -71,16 +86,76 @@ const CATEGORIES = [
   { label: 'Live', filter: 'live' },
 ];
 
-// ---------- Bộ nhớ cục bộ (lịch sử + sở thích, chỉ trên máy) ----------
+// ---------- Lớp dữ liệu: mọi dữ liệu đọc/ghi đều qua đây ----------
+// App là web tĩnh, không có máy chủ riêng. Dữ liệu gắn theo hồ sơ:
+// - Chưa đăng nhập: key cũ 'ytxtube:<key>' (giữ nguyên — dữ liệu local cũ
+//   của người dùng KHÔNG mất khi cập nhật lên bản này).
+// - Đã đăng nhập (Email/Google): 'ytxtube:acct:<accountId>:<key>' — đổi tài
+//   khoản là đổi bộ dữ liệu. Đăng nhập nạp đúng bộ của tài khoản đó, đăng
+//   xuất về lại bộ local. 'ytxtube:profile' (hồ sơ đang dùng) KHÔNG qua lớp
+//   này: nó là bộ chọn tài khoản, luôn lưu ở key cố định.
+// - Cloud (Firebase, khi có cấu hình) đồng bộ đúng bộ key của tài khoản
+//   đang dùng; xem module Firebase bên dưới. Chuẩn bị cho cloud sau này:
+//   chỉ cần gắn thêm provider vào store.set / mergeCloudData, không sửa
+//   các chỗ đọc/ghi lẻ tẻ.
+function loadProfile() { try { return JSON.parse(localStorage.getItem('ytxtube:profile')) || null; } catch { return null; } }
+let profile = loadProfile(); // {name, avatar, method:'email'|'google', email?, sub?} | null
+function simpleHash(s) { let h = 5381; const str = String(s || ''); for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) >>> 0; return h.toString(16); }
+function accountId(p) {
+  if (!p) return null;
+  if (p.method === 'google' && p.sub) return 'g:' + String(p.sub);
+  if (p.email) return 'e:' + simpleHash(String(p.email).trim().toLowerCase());
+  return 'n:' + simpleHash(String(p.name || '').trim().toLowerCase());
+}
+function dataPrefix() { const id = accountId(profile); return id ? 'ytxtube:acct:' + id + ':' : 'ytxtube:'; }
+// Mọi key dữ liệu của app (đồng bộ cloud / xuất-nhập đều dùng danh sách này).
+const DATA_KEYS = ['liked', 'disliked', 'subscribed', 'savedVideos', 'likedMeta', 'history', 'prefWords', 'subMeta', 'shortsSeen', 'downloads', 'settings', 'sbSettings', 'language', 'qualityLock'];
 const store = {
   get(key, fallback) {
-    try { return JSON.parse(localStorage.getItem('ytxtube:' + key)) ?? fallback; }
+    try { return JSON.parse(localStorage.getItem(dataPrefix() + key)) ?? fallback; }
     catch { return fallback; }
   },
   set(key, value) {
-    try { localStorage.setItem('ytxtube:' + key, JSON.stringify(value)); } catch { /* ẩn danh: bỏ qua */ }
+    try { localStorage.setItem(dataPrefix() + key, JSON.stringify(value)); } catch { /* ẩn danh: bỏ qua */ }
+    touchSyncMeta(key);
+    scheduleCloudPush(); // tự đẩy lên cloud (debounce) khi có Firebase — không cần bấm nút
   },
+  // Ghi dữ liệu nhận từ cloud / file import: không đẩy lại lên cloud.
+  setRemote(key, value, updatedAt) {
+    try { localStorage.setItem(dataPrefix() + key, JSON.stringify(value)); } catch { /* ignore */ }
+    if (updatedAt) setSyncMeta(key, updatedAt);
+  },
+  remove(key) { try { localStorage.removeItem(dataPrefix() + key); } catch { /* ignore */ } },
 };
+// updatedAt từng key (để gộp cloud: bản mới nhất thắng từng mục).
+function getSyncMeta() { try { return JSON.parse(localStorage.getItem(dataPrefix() + '__meta')) || {}; } catch { return {}; } }
+function setSyncMeta(key, ms) { try { const m = getSyncMeta(); m[key] = ms; localStorage.setItem(dataPrefix() + '__meta', JSON.stringify(m)); } catch { /* ignore */ } }
+function touchSyncMeta(key) { if (key === '__meta') return; setSyncMeta(key, Date.now()); }
+// Nạp lại toàn bộ dữ liệu theo hồ sơ hiện tại (đăng nhập / đăng xuất / đổi tài khoản).
+function reloadScopedState() {
+  liked = new Set(store.get('liked', []));
+  disliked = new Set(store.get('disliked', []));
+  subscribed = new Set(store.get('subscribed', []));
+  savedVideos = store.get('savedVideos', {});
+  likedMeta = store.get('likedMeta', {});
+  history = store.get('history', []);
+  prefWords = store.get('prefWords', {});
+  subMeta = store.get('subMeta', {});
+  shortsSeen = new Set(store.get('shortsSeen', []));
+  downloads = store.get('downloads', []);
+  appSettings = Object.assign({ glass: true, theme: 'system', bgPlayback: true, autoplayNext: true }, store.get('settings', {}));
+  sbSettings = Object.assign(
+    { enabled: true, cats: { sponsor: true, intro: true, outro: true, selfpromo: false, interaction: false, music_offtopic: false } },
+    store.get('sbSettings', {}));
+  langSetting = store.get('language', 'system');
+  qualityLock = store.get('qualityLock', 'auto');
+}
+// Vẽ lại giao diện sau khi đổi bộ dữ liệu (đăng nhập / đăng xuất / cloud về).
+function refreshAccountUI() {
+  applySettings(); // theme / Liquid Glass / toggles + syncSettingsUI
+  applyI18n(); // ngôn ngữ + vẽ lại các màn đang mở (Library / Saved / Music)
+  updateCloudStatusUI();
+}
 let liked = new Set(store.get('liked', []));
 let disliked = new Set(store.get('disliked', []));
 let subscribed = new Set(store.get('subscribed', [])); // channel names (local only)
@@ -88,6 +163,291 @@ let savedVideos = store.get('savedVideos', {}); // id -> {id,title,uploader,thum
 let likedMeta = store.get('likedMeta', {});     // id -> {id,title,uploader,thumbnail,duration}
 let history = store.get('history', []);       // [{id, title, category, at}]
 let prefWords = store.get('prefWords', {});   // {từ khóa: số lần xem}
+
+// ---------- Đồng bộ cloud Firebase (gói miễn phí Spark) ----------
+// Firestore: collection 'users', doc id = accountId đã đổi ':' → '_' (Google:
+// 'g_<sub>'; Email: 'e_<hash>' — KHÔNG lưu email trần làm doc id), 1 field
+// 'data' chứa toàn bộ JSON dữ liệu + 'updatedAt' (map từng key → ms) +
+// 'updatedAtDoc'. Xem README để tạo project + rules mẫu.
+// Đồng bộ 2 chiều, tự động như YouTube (không bấm nút):
+// - Mọi thay đổi local (thích, đăng ký, lưu, lịch sử, cài đặt, ngôn ngữ,
+//   chất lượng...) tự đẩy lên cloud sau debounce ~2.5 giây.
+// - onSnapshot lắng nghe realtime: máy khác đổi là tự tải về, gộp và cập
+//   nhật giao diện đang mở ngay, không cần tải lại trang.
+// - Gộp thông minh từng mục: bản mới nhất theo updatedAt thắng từng key,
+//   không ghi đè cả bộ, không tự xóa dữ liệu của nhau.
+// - Mất mạng: dùng local, có mạng lại thì đẩy tiếp (cloudDirty + 'online').
+// - Config trống: module này không nạp SDK, không lỗi console, app chạy y
+//   như không có Firebase (local theo tài khoản + xuất/nhập file).
+// GIỚI HẠN BẢO MẬT: Email local không có xác thực server nên khóa đồng bộ
+// chỉ là định danh local; rules Firestore "chỉ chủ sở hữu" chỉ có tác dụng
+// khi bật Firebase Auth (chưa có trong bản này) — xem README, đừng nói quá.
+let firebaseApp = null, firebaseDb = null, firebaseReady = false, firebaseLoading = false;
+let cloudUnsubscribe = null, cloudPushTimer = null, cloudDirty = false;
+let cloudStatus = 'off'; // 'off' | 'on' | 'error'
+let cloudLastSyncAt = 0, cloudLastError = '';
+function firebaseEnabled() { try { return !!(FIREBASE_CONFIG && FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.projectId); } catch { return false; } }
+function cloudDocId() { const id = accountId(profile); return id ? id.replace(':', '_') : null; }
+function loadScript(src) { return new Promise((resolve, reject) => { const s = document.createElement('script'); s.src = src; s.onload = () => resolve(); s.onerror = () => reject(new Error('load ' + src)); document.head.appendChild(s); }); }
+async function ensureFirebase() {
+  if (!firebaseEnabled() || firebaseReady) return firebaseReady;
+  if (firebaseLoading) return false;
+  firebaseLoading = true;
+  try {
+    await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');
+    await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js');
+    if (!window.firebase || !firebase.firestore) throw new Error('Firebase SDK not loaded');
+    firebaseApp = firebase.initializeApp(FIREBASE_CONFIG);
+    firebaseDb = firebaseApp.firestore();
+    firebaseReady = true;
+    setCloudStatus('on');
+  } catch (e) { firebaseReady = false; setCloudStatus('error', e && e.message); }
+  firebaseLoading = false;
+  return firebaseReady;
+}
+function collectLocalData() {
+  const data = {};
+  for (const k of DATA_KEYS) { const v = store.get(k, undefined); if (v !== undefined) data[k] = v; }
+  return data;
+}
+async function pushToCloud() {
+  if (!firebaseEnabled() || !profile || !firebaseReady || !firebaseDb) return false;
+  const docId = cloudDocId(); if (!docId) return false;
+  try {
+    await firebaseDb.collection('users').doc(docId).set(
+      { data: collectLocalData(), updatedAt: getSyncMeta(), updatedAtDoc: Date.now() }, { merge: true });
+    cloudDirty = false; cloudLastSyncAt = Date.now(); setCloudStatus('on');
+    return true;
+  } catch (e) { cloudDirty = true; setCloudStatus('error', e && e.message); return false; }
+}
+function scheduleCloudPush() {
+  try {
+    if (!firebaseEnabled() || !profile) return;
+    if (!firebaseReady) { cloudDirty = true; return; }
+    clearTimeout(cloudPushTimer);
+    cloudPushTimer = setTimeout(() => { pushToCloud(); }, 2500);
+  } catch { /* ignore */ }
+}
+// Gộp dữ liệu cloud về local: từng key, bản mới nhất theo updatedAt thắng.
+function mergeCloudData(doc) {
+  if (!doc || !doc.data || typeof doc.data !== 'object') return false;
+  const cloudData = doc.data || {};
+  const cloudMeta = doc.updatedAt || {};
+  const localMeta = getSyncMeta();
+  let changed = false, localNewer = false;
+  for (const key of DATA_KEYS) {
+    if (!(key in cloudData)) continue;
+    const ct = Number(cloudMeta[key]) || 0, lt = Number(localMeta[key]) || 0;
+    if (ct > lt) { store.setRemote(key, cloudData[key], ct); changed = true; }
+    else if (lt > ct) localNewer = true;
+  }
+  if (changed) { reloadScopedState(); refreshAccountUI(); }
+  if (localNewer) scheduleCloudPush();
+  if (changed || localNewer) { cloudLastSyncAt = Date.now(); setCloudStatus('on'); }
+  return changed;
+}
+async function startCloudSync() {
+  stopCloudSync();
+  if (!firebaseEnabled() || !profile) { setCloudStatus('off'); return; }
+  const myDoc = cloudDocId();
+  const ok = await ensureFirebase();
+  if (!ok || !firebaseDb || !profile || cloudDocId() !== myDoc) return;
+  try {
+    const snap = await firebaseDb.collection('users').doc(myDoc).get();
+    if (snap.exists) mergeCloudData(snap.data());
+    if (!profile || cloudDocId() !== myDoc) return;
+    cloudUnsubscribe = firebaseDb.collection('users').doc(myDoc).onSnapshot((s) => {
+      if (!s.exists) return;
+      if (mergeCloudData(s.data())) toast(t('sync.updated'));
+    }, (err) => setCloudStatus('error', err && err.message));
+    if (cloudDirty) scheduleCloudPush();
+  } catch (e) { setCloudStatus('error', e && e.message); }
+}
+function stopCloudSync() {
+  if (cloudUnsubscribe) { try { cloudUnsubscribe(); } catch { /* ignore */ } cloudUnsubscribe = null; }
+  clearTimeout(cloudPushTimer);
+}
+function setCloudStatus(status, err) {
+  cloudStatus = status;
+  if (err) cloudLastError = String(err);
+  updateCloudStatusUI();
+}
+function updateCloudStatusUI() {
+  const el = $('cloudSyncInfo'); if (!el) return;
+  if (!firebaseEnabled()) { el.textContent = t('sync.off'); return; }
+  if (!profile) { el.textContent = t('sync.signInToSync'); return; }
+  if (cloudStatus === 'error') { el.textContent = t('sync.error'); return; }
+  el.textContent = t('sync.on') + (cloudLastSyncAt ? ' • ' + t('sync.lastSync', { time: new Date(cloudLastSyncAt).toLocaleTimeString(langLocale()) }) : '');
+}
+window.addEventListener('online', () => {
+  if (!firebaseEnabled() || !profile) return;
+  if (cloudDirty && firebaseReady) pushToCloud();
+  else if (!firebaseReady) startCloudSync();
+});
+
+// ---------- Hồ sơ / đăng nhập (Google + Email — KHÔNG có Apple ID) ----------
+// Email: hồ sơ local trên máy, dùng được ngay, không cần máy chủ (nhập
+// email + tên, kiểm tra định dạng, lưu {name, email, avatar, method:'email'}).
+// Google: luồng thật bằng Google Identity Services (GIS). Client ID lấy từ
+// GOOGLE_CLIENT_ID ở đầu file; để trống thì nút Google chỉ báo chưa cấu
+// hình — KHÔNG giả vờ đăng nhập thành công.
+// Trong WKWebView của app đã cài, popup Google có thể cần xử lý thêm phía
+// Swift (chưa có) — Google chắc chắn chạy trên link web (Safari).
+const AVATAR_CHOICES = ['🦊', '🐼', '🦁', '🐸', '🦄', '🚀', '🎸', '⚽'];
+let profileAvatarChoice = '🦊';
+let gisLoaded = false, gisLoading = false, googleBtnRendered = false;
+function saveProfile(p) { profile = p; try { localStorage.setItem('ytxtube:profile', JSON.stringify(p)); } catch { /* ignore */ } }
+function clearProfile() { profile = null; try { localStorage.removeItem('ytxtube:profile'); } catch { /* ignore */ } }
+function avatarColor(name) { const colors = ['#e53935', '#8e24aa', '#3949ab', '#00897b', '#7cb342', '#fb8c00', '#6d4c41', '#546e7a']; let h = 0; const s = String(name || '?'); for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return colors[h % colors.length]; }
+function avatarHTML(p) {
+  if (!p) return '👤';
+  if (p.avatar && /^https?:\/\//.test(p.avatar)) return `<img src="${esc(p.avatar)}" alt="" referrerpolicy="no-referrer">`;
+  if (p.avatar === 'letter') return `<span class="avatar-letter" style="background:${avatarColor(p.name || '?')}">${esc((p.name || '?').trim().charAt(0).toUpperCase())}</span>`;
+  return esc(p.avatar || '👤');
+}
+function syncProfileUI() {
+  const btn = $('historyBtn');
+  btn.innerHTML = avatarHTML(profile);
+  btn.title = profile ? t('profile.myProfile') : t('profile.title');
+  btn.setAttribute('aria-label', btn.title);
+  $('profileSheetTitle').textContent = profile ? t('profile.myProfile') : t('profile.title');
+  $('profileSignInView').hidden = !!profile;
+  $('profileView').hidden = !profile;
+  if (profile) {
+    $('profileAvatarBig').innerHTML = avatarHTML(profile);
+    $('profileName').textContent = profile.name || '';
+    $('profileEmail').textContent = profile.email || '';
+    $('profileMethod').textContent = profile.method === 'google' ? t('profile.methodGoogle') : t('profile.methodEmail');
+    $('profileDataNote').textContent = t('profile.dataNote');
+  }
+  renderGoogleButton();
+  updateCloudStatusUI();
+}
+function renderAvatarPicker() {
+  const name = ($('profileNameInput').value || '').trim();
+  const letter = name ? name.charAt(0).toUpperCase() : 'A';
+  $('profileAvatarPicker').innerHTML = AVATAR_CHOICES.map((e) =>
+    `<button type="button" class="avatar-opt${profileAvatarChoice === e ? ' selected' : ''}" data-avatar="${e}">${e}</button>`).join('')
+    + `<button type="button" class="avatar-opt${profileAvatarChoice === 'letter' ? ' selected' : ''}" data-avatar="letter"><span class="avatar-letter" style="background:${avatarColor(name || 'A')}">${esc(letter)}</span></button>`;
+}
+function openProfileSheet() {
+  $('profileSheet').hidden = false;
+  syncProfileUI();
+  renderAvatarPicker();
+}
+function closeProfileSheet() { $('profileSheet').hidden = true; }
+function signInWithEmail() {
+  const email = $('profileEmailInput').value.trim().toLowerCase();
+  const name = $('profileNameInput').value.trim();
+  if (!name) { toast(t('profile.nameRequired')); $('profileNameInput').focus(); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { toast(t('profile.emailInvalid')); $('profileEmailInput').focus(); return; }
+  applyProfileAndReload({ name, email, avatar: profileAvatarChoice, method: 'email' });
+  closeProfileSheet();
+  toast(t('profile.signedIn', { name }));
+}
+function loadGis() {
+  if (gisLoaded) return Promise.resolve(true);
+  if (gisLoading) return Promise.resolve(false);
+  gisLoading = true;
+  return loadScript('https://accounts.google.com/gsi/client').then(() => { gisLoaded = true; gisLoading = false; return true; }).catch(() => { gisLoading = false; return false; });
+}
+function renderGoogleButton() {
+  $('googleSignInBtn').hidden = !!GOOGLE_CLIENT_ID;
+  $('googleBtnWrap').hidden = !GOOGLE_CLIENT_ID;
+  if (!GOOGLE_CLIENT_ID || googleBtnRendered || $('profileSheet').hidden) return;
+  loadGis().then((ok) => {
+    if (!ok || !window.google || !google.accounts || !google.accounts.id) return;
+    try {
+      google.accounts.id.initialize({ client_id: GOOGLE_CLIENT_ID, callback: handleGoogleCredential });
+      google.accounts.id.renderButton($('googleBtnWrap'), { theme: 'outline', size: 'large', width: 320, text: 'continue_with' });
+      googleBtnRendered = true;
+    } catch { /* ignore */ }
+  });
+}
+function decodeJwtPayload(token) {
+  const part = String(token || '').split('.')[1] || '';
+  const b64 = part.replace(/-/g, '+').replace(/_/g, '/');
+  const padded = b64 + '='.repeat((4 - (b64.length % 4)) % 4);
+  return JSON.parse(atob(padded));
+}
+function handleGoogleCredential(resp) {
+  try {
+    const payload = decodeJwtPayload(resp.credential);
+    const p = { name: payload.name || payload.email || 'Google', email: payload.email || '', avatar: payload.picture || 'letter', method: 'google', sub: payload.sub || '' };
+    applyProfileAndReload(p);
+    closeProfileSheet();
+    toast(t('profile.signedIn', { name: p.name }));
+  } catch { toast(t('profile.googleFailed')); }
+}
+// Đăng nhập / đăng xuất: đổi hồ sơ → đổi bộ dữ liệu → đồng bộ cloud.
+async function applyProfileAndReload(p) {
+  stopCloudSync();
+  saveProfile(p);
+  reloadScopedState();
+  refreshAccountUI();
+  if (!p) { setCloudStatus('off'); return; }
+  // 1) Cloud trước (nếu có): tải về + gộp — cloud là nguồn sự thật cho
+  //    tài khoản đã có dữ liệu ở máy khác.
+  if (firebaseEnabled()) await startCloudSync();
+  // 2) Tài khoản vẫn trống hoàn toàn → copy dữ liệu local trên máy này
+  //    sang (1 lần duy nhất) để lịch sử/đã thích/đăng ký không "biến mất".
+  seedAccountFromLocalIfFresh();
+  if (firebaseEnabled() && firebaseReady) scheduleCloudPush();
+}
+function signOut() {
+  stopCloudSync();
+  clearProfile();
+  reloadScopedState();
+  refreshAccountUI();
+  setCloudStatus('off');
+  closeProfileSheet();
+  toast(t('profile.signedOut'));
+}
+function seedAccountFromLocalIfFresh() {
+  let hasAny = false;
+  for (const k of DATA_KEYS) { try { if (localStorage.getItem(dataPrefix() + k) !== null) { hasAny = true; break; } } catch { /* ignore */ } }
+  if (hasAny) return;
+  let copied = false;
+  for (const k of DATA_KEYS) {
+    try {
+      const raw = localStorage.getItem('ytxtube:' + k);
+      if (raw !== null) { localStorage.setItem(dataPrefix() + k, raw); setSyncMeta(k, Date.now()); copied = true; }
+    } catch { /* ignore */ }
+  }
+  if (copied) { reloadScopedState(); refreshAccountUI(); toast(t('profile.seeded')); }
+}
+
+// ---------- Xuất / nhập dữ liệu (đồng bộ thủ công sang máy khác) ----------
+// 1 file JSON chứa toàn bộ dữ liệu của tài khoản đang dùng (theo DATA_KEYS).
+// Trên iOS Safari, file mở trong tab mới — dùng nút Share → Save to Files.
+function exportData() {
+  const data = {};
+  for (const k of DATA_KEYS) { const v = store.get(k, undefined); if (v !== undefined) data[k] = v; }
+  const payload = { app: 'ytxtube-ios', version: 1, exportedAt: new Date().toISOString(), account: profile ? (profile.email || profile.name) : 'local', data };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'ytxtube-data.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  toast(t('sync.exported'));
+}
+function importDataFile(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const payload = JSON.parse(reader.result);
+      if (!payload || typeof payload !== 'object' || !payload.data || typeof payload.data !== 'object') throw new Error('bad file');
+      if (!confirm(t('sync.importConfirm'))) return;
+      for (const k of DATA_KEYS) { if (k in payload.data) store.setRemote(k, payload.data[k], Date.now()); }
+      reloadScopedState(); refreshAccountUI();
+      scheduleCloudPush();
+      toast(t('sync.imported'));
+    } catch { toast(t('sync.importFailed')); }
+  };
+  reader.readAsText(file);
+}
 
 // ---------- Đa ngôn ngữ (i18n) — Android v2.2.0 có "multiple languages support" ----------
 // t(key) fallback chain: chosen language -> English -> key itself. Never blank.
@@ -170,7 +530,7 @@ en: {
 'settings.storageUsage': 'Storage usage', 'settings.clearCache': 'Clear cache',
 'settings.clearCacheSub': 'Removes history, preferences and seen Shorts — not your likes, saves, downloads or subscriptions',
 'settings.version': 'Version', 'settings.versionSub': 'YTXTube iOS v2.2.0 — clean-room port of Android YTXTube v2.2.0 (GPL-3.0)',
-'settings.accounts': 'Accounts', 'settings.accountsSub': 'No Google sign-in in this build — subscriptions are stored on this device only.',
+'settings.accounts': 'Accounts', 'settings.accountsSub': 'Sign in from the avatar button at the top. Google sign-in needs a Client ID — see README; Email profiles stay on this device.',
 'settings.sbSub': 'Automatically skip segments — community data from sponsor.ajay.app (CC BY-NC-SA 4.0)',
 'settings.sbCatSub': 'Skip automatically',
 'sb.sponsor': 'Sponsor', 'sb.intro': 'Intro', 'sb.outro': 'Outro and credits', 'sb.selfpromo': 'Self-promotion',
@@ -190,6 +550,51 @@ en: {
 'status.noRecentSubs': 'No recent videos from your subscriptions.', 'status.loadingSubs': 'Loading videos from your subscriptions…',
 'status.searching': 'Searching for “{q}”…', 'status.loadingTrending': 'Loading trending…',
 'status.loadingChannel': 'Loading channel videos…', 'status.noVideosChannel': 'No videos found for {name}.',
+'profile.title': 'Sign in',
+'profile.myProfile': 'My profile',
+'profile.nameLabel': 'Display name',
+'profile.namePlaceholder': 'Your name…',
+'profile.avatarLabel': 'Choose an avatar',
+'profile.signIn': 'Sign in',
+'profile.signOut': 'Sign out',
+'profile.localNote': 'Your Email profile is stored on this device only — it is not a real Google/YouTube account.',
+'profile.nameRequired': 'Enter a display name first.',
+'profile.signedIn': 'Signed in as {name}.',
+'profile.signedOut': 'Signed out.',
+'profile.emailLabel': 'Email',
+'profile.emailPlaceholder': 'you@example.com',
+'profile.emailInvalid': 'Enter a valid email address.',
+'profile.googleButton': 'Continue with Google',
+'profile.googleNotConfigured': 'Google sign-in is not set up yet — add your Google Client ID in the app settings (see README).',
+'profile.googleFailed': 'Google sign-in failed — try again.',
+'profile.or': 'or',
+'profile.methodEmail': 'Email',
+'profile.methodGoogle': 'Google',
+'profile.seeded': 'Your data from this device was copied to this account.',
+'profile.dataNote': 'History, likes, subscriptions and settings for this account are kept separately.',
+'sync.title': 'Cloud sync',
+'sync.off': 'Cloud sync: not configured',
+'sync.on': 'Cloud sync: on',
+'sync.error': 'Cloud sync error — using local data.',
+'sync.lastSync': 'Last synced {time}',
+'sync.signInToSync': 'Sign in to sync across devices.',
+'sync.updated': 'Updated from another device.',
+'sync.export': 'Export data',
+'sync.import': 'Import data',
+'sync.exported': 'Data exported.',
+'sync.importConfirm': 'Replace all current data with the imported file? This cannot be undone.',
+'sync.imported': 'Data imported.',
+'sync.importFailed': 'Could not read that file — check it is a YTXTube export.',
+'sync.exportImport': 'Move data to another device',
+'sync.exportImportSub': 'Export a JSON file, then import it on the other device.',
+'common.live': 'Live',
+'common.upcoming': 'Not yet live',
+'common.premieresAt': 'Premieres at {time} • {date}',
+'status.loadingMore': 'Loading more videos…',
+'status.loadMoreError': 'Couldn’t load more — check your connection.',
+'watch.backToLive': 'Back to live',
+'watch.liveEnded': 'This live stream has ended.',
+'watch.wentLive': 'This stream is live now.',
 },
 vi: {
 'common.views': 'lượt xem', 'common.likes': 'lượt thích', 'common.subscribers': 'người đăng ký', 'common.channel': 'Kênh',
@@ -267,7 +672,7 @@ vi: {
 'settings.storageUsage': 'Dung lượng đã dùng', 'settings.clearCache': 'Xóa bộ nhớ đệm',
 'settings.clearCacheSub': 'Xóa lịch sử, tùy chọn và Shorts đã xem — không xóa lượt thích, video đã lưu, lượt tải hay kênh đã đăng ký',
 'settings.version': 'Phiên bản', 'settings.versionSub': 'YTXTube iOS v2.2.0 — bản port clean-room từ YTXTube Android v2.2.0 (GPL-3.0)',
-'settings.accounts': 'Tài khoản', 'settings.accountsSub': 'Bản này không có đăng nhập Google — kênh đăng ký chỉ lưu trên máy này.',
+'settings.accounts': 'Tài khoản', 'settings.accountsSub': 'Đăng nhập bằng nút avatar ở trên. Google cần Client ID — xem README; hồ sơ Email chỉ lưu trên máy này.',
 'settings.sbSub': 'Tự động bỏ qua đoạn — dữ liệu cộng đồng từ sponsor.ajay.app (CC BY-NC-SA 4.0)',
 'settings.sbCatSub': 'Tự động bỏ qua',
 'sb.sponsor': 'Quảng cáo tài trợ', 'sb.intro': 'Mở đầu', 'sb.outro': 'Kết thúc và credit', 'sb.selfpromo': 'Tự quảng cáo',
@@ -287,6 +692,51 @@ vi: {
 'status.noRecentSubs': 'Không có video mới từ kênh đã đăng ký.', 'status.loadingSubs': 'Đang tải video từ kênh đã đăng ký…',
 'status.searching': 'Đang tìm “{q}”…', 'status.loadingTrending': 'Đang tải video thịnh hành…',
 'status.loadingChannel': 'Đang tải video của kênh…', 'status.noVideosChannel': 'Không tìm thấy video của {name}.',
+'profile.title': 'Đăng nhập',
+'profile.myProfile': 'Hồ sơ của tôi',
+'profile.nameLabel': 'Tên hiển thị',
+'profile.namePlaceholder': 'Tên của bạn…',
+'profile.avatarLabel': 'Chọn ảnh đại diện',
+'profile.signIn': 'Đăng nhập',
+'profile.signOut': 'Đăng xuất',
+'profile.localNote': 'Hồ sơ Email chỉ lưu trên máy này — không phải tài khoản Google/YouTube thật.',
+'profile.nameRequired': 'Nhập tên hiển thị trước đã.',
+'profile.signedIn': 'Đã đăng nhập: {name}.',
+'profile.signedOut': 'Đã đăng xuất.',
+'profile.emailLabel': 'Email',
+'profile.emailPlaceholder': 'ban@example.com',
+'profile.emailInvalid': 'Nhập địa chỉ email hợp lệ.',
+'profile.googleButton': 'Tiếp tục với Google',
+'profile.googleNotConfigured': 'Chưa cấu hình đăng nhập Google — thêm Google Client ID vào phần cấu hình (xem README).',
+'profile.googleFailed': 'Đăng nhập Google thất bại — thử lại.',
+'profile.or': 'hoặc',
+'profile.methodEmail': 'Email',
+'profile.methodGoogle': 'Google',
+'profile.seeded': 'Đã chuyển dữ liệu trên máy này sang tài khoản này.',
+'profile.dataNote': 'Lịch sử, video đã thích, kênh đã đăng ký và cài đặt của tài khoản này được lưu riêng.',
+'sync.title': 'Đồng bộ cloud',
+'sync.off': 'Đồng bộ cloud: chưa cấu hình',
+'sync.on': 'Đồng bộ cloud: đang bật',
+'sync.error': 'Lỗi đồng bộ cloud — đang dùng dữ liệu trên máy.',
+'sync.lastSync': 'Đồng bộ lần cuối {time}',
+'sync.signInToSync': 'Đăng nhập để đồng bộ giữa các thiết bị.',
+'sync.updated': 'Đã cập nhật từ thiết bị khác.',
+'sync.export': 'Xuất dữ liệu',
+'sync.import': 'Nhập dữ liệu',
+'sync.exported': 'Đã xuất dữ liệu.',
+'sync.importConfirm': 'Ghi đè toàn bộ dữ liệu hiện tại bằng file đã nhập? Không thể hoàn tác.',
+'sync.imported': 'Đã nhập dữ liệu.',
+'sync.importFailed': 'Không đọc được file đó — kiểm tra xem có phải file xuất từ YTXTube không.',
+'sync.exportImport': 'Chuyển dữ liệu sang máy khác',
+'sync.exportImportSub': 'Xuất 1 file JSON, rồi nhập file đó trên máy kia.',
+'common.live': 'Trực tiếp',
+'common.upcoming': 'Chưa chiếu',
+'common.premieresAt': 'Chiếu lúc {time} • {date}',
+'status.loadingMore': 'Đang tải thêm video…',
+'status.loadMoreError': 'Không tải thêm được — kiểm tra kết nối mạng.',
+'watch.backToLive': 'Quay lại trực tiếp',
+'watch.liveEnded': 'Luồng trực tiếp này đã kết thúc.',
+'watch.wentLive': 'Luồng này đang phát trực tiếp.',
 },
 };
 // Primary UI strings only for es/zh/ja/ko — every other key falls back to English.
@@ -412,7 +862,7 @@ I18N.es = {
 'settings.autoplayNext': 'Reproducir el siguiente video', 'settings.autoplayNextSub': 'Reproduce el siguiente video relacionado cuando este termine',
 'settings.playbackQuality': 'Calidad de reproducción', 'settings.storageUsage': 'Uso de almacenamiento', 'settings.clearCache': 'Borrar caché',
 'settings.version': 'Versión', 'settings.accounts': 'Cuentas',
-'settings.accountsSub': 'No hay inicio de sesión con Google en esta versión — las suscripciones se guardan solo en este dispositivo.',
+'settings.accountsSub': 'Inicia sesión con el botón de avatar de arriba. Google necesita un Client ID — ver README; los perfiles de correo se quedan en este dispositivo.',
 'sb.sponsor': 'Patrocinador', 'sb.intro': 'Introducción', 'sb.outro': 'Créditos finales', 'sb.selfpromo': 'Autopromoción',
 'sb.interaction': 'Recordatorio de me gusta y suscripción', 'sb.musicOfftopic': 'Parte sin música de un video musical',
 'toast.searchFailed': 'La búsqueda falló — revisa tu conexión e inténtalo de nuevo.',
@@ -420,6 +870,51 @@ I18N.es = {
 'toast.savedAdded': 'Guardado — encuéntralo en la pestaña Guardados.', 'toast.savedRemoved': 'Eliminado de Guardados.',
 'status.noVideos': 'No se encontraron videos.', 'status.noMore': 'No hay más videos — prueba otro filtro.',
 'status.loadingTrending': 'Cargando tendencias…',
+'profile.title': 'Iniciar sesión',
+'profile.myProfile': 'Mi perfil',
+'profile.nameLabel': 'Nombre visible',
+'profile.namePlaceholder': 'Tu nombre…',
+'profile.avatarLabel': 'Elige un avatar',
+'profile.signIn': 'Iniciar sesión',
+'profile.signOut': 'Cerrar sesión',
+'profile.localNote': 'Tu perfil de correo se guarda solo en este dispositivo — no es una cuenta real de Google/YouTube.',
+'profile.nameRequired': 'Escribe primero un nombre visible.',
+'profile.signedIn': 'Sesión iniciada como {name}.',
+'profile.signedOut': 'Sesión cerrada.',
+'profile.emailLabel': 'Correo electrónico',
+'profile.emailPlaceholder': 'tu@ejemplo.com',
+'profile.emailInvalid': 'Escribe una dirección de correo válida.',
+'profile.googleButton': 'Continuar con Google',
+'profile.googleNotConfigured': 'El inicio de sesión con Google aún no está configurado — añade tu Client ID de Google en la configuración (ver README).',
+'profile.googleFailed': 'Error al iniciar sesión con Google — inténtalo de nuevo.',
+'profile.or': 'o',
+'profile.methodEmail': 'Correo',
+'profile.methodGoogle': 'Google',
+'profile.seeded': 'Tus datos de este dispositivo se copiaron a esta cuenta.',
+'profile.dataNote': 'El historial, los me gusta, las suscripciones y los ajustes de esta cuenta se guardan por separado.',
+'sync.title': 'Sincronización en la nube',
+'sync.off': 'Sincronización en la nube: no configurada',
+'sync.on': 'Sincronización en la nube: activada',
+'sync.error': 'Error de sincronización en la nube — usando datos locales.',
+'sync.lastSync': 'Última sincronización {time}',
+'sync.signInToSync': 'Inicia sesión para sincronizar entre dispositivos.',
+'sync.updated': 'Actualizado desde otro dispositivo.',
+'sync.export': 'Exportar datos',
+'sync.import': 'Importar datos',
+'sync.exported': 'Datos exportados.',
+'sync.importConfirm': '¿Reemplazar todos los datos actuales con el archivo importado? No se puede deshacer.',
+'sync.imported': 'Datos importados.',
+'sync.importFailed': 'No se pudo leer ese archivo — comprueba que sea una exportación de YTXTube.',
+'sync.exportImport': 'Mover datos a otro dispositivo',
+'sync.exportImportSub': 'Exporta un archivo JSON y luego impórtalo en el otro dispositivo.',
+'common.live': 'En vivo',
+'common.upcoming': 'Aún no en vivo',
+'common.premieresAt': 'Se estrena a las {time} • {date}',
+'status.loadingMore': 'Cargando más videos…',
+'status.loadMoreError': 'No se pudo cargar más — revisa tu conexión.',
+'watch.backToLive': 'Volver al en vivo',
+'watch.liveEnded': 'Esta transmisión en vivo ha terminado.',
+'watch.wentLive': 'Esta transmisión está en vivo ahora.',
 };
 I18N.zh = {
 'toast.subscribed': '已订阅 {name}。',
@@ -543,7 +1038,7 @@ I18N.zh = {
 'settings.autoplayNext': '自动播放下一个视频', 'settings.autoplayNextSub': '当前视频结束后自动播放下一个相关视频',
 'settings.playbackQuality': '播放画质', 'settings.storageUsage': '存储用量', 'settings.clearCache': '清除缓存',
 'settings.version': '版本', 'settings.accounts': '账号',
-'settings.accountsSub': '此版本没有 Google 登录——订阅仅保存在本设备上。',
+'settings.accountsSub': '点击顶部的头像按钮登录。Google 登录需要客户端 ID——见 README；邮箱资料仅保存在本设备上。',
 'sb.sponsor': '赞助内容', 'sb.intro': '片头', 'sb.outro': '片尾和字幕', 'sb.selfpromo': '自我推广',
 'sb.interaction': '点赞和订阅提醒', 'sb.musicOfftopic': '音乐视频中的非音乐部分',
 'toast.searchFailed': '搜索失败——请检查网络后重试。',
@@ -551,6 +1046,51 @@ I18N.zh = {
 'toast.savedAdded': '已保存——在“已保存”标签页中查看。', 'toast.savedRemoved': '已从已保存中移除。',
 'status.noVideos': '未找到视频。', 'status.noMore': '没有更多视频了——换个筛选试试。',
 'status.loadingTrending': '正在加载热门视频…',
+'profile.title': '登录',
+'profile.myProfile': '我的资料',
+'profile.nameLabel': '显示名称',
+'profile.namePlaceholder': '你的名字…',
+'profile.avatarLabel': '选择头像',
+'profile.signIn': '登录',
+'profile.signOut': '退出登录',
+'profile.localNote': '你的邮箱资料仅保存在本设备上——不是真正的 Google/YouTube 账号。',
+'profile.nameRequired': '请先输入显示名称。',
+'profile.signedIn': '已登录：{name}。',
+'profile.signedOut': '已退出登录。',
+'profile.emailLabel': '邮箱',
+'profile.emailPlaceholder': 'you@example.com',
+'profile.emailInvalid': '请输入有效的邮箱地址。',
+'profile.googleButton': '使用 Google 继续',
+'profile.googleNotConfigured': '尚未设置 Google 登录——请在应用设置中添加 Google 客户端 ID（见 README）。',
+'profile.googleFailed': 'Google 登录失败——请重试。',
+'profile.or': '或',
+'profile.methodEmail': '邮箱',
+'profile.methodGoogle': 'Google',
+'profile.seeded': '已将本设备上的数据复制到此账号。',
+'profile.dataNote': '此账号的历史记录、喜欢的视频、订阅和设置将单独保存。',
+'sync.title': '云同步',
+'sync.off': '云同步：未配置',
+'sync.on': '云同步：已开启',
+'sync.error': '云同步出错——正在使用本地数据。',
+'sync.lastSync': '上次同步 {time}',
+'sync.signInToSync': '登录后可在设备之间同步。',
+'sync.updated': '已从另一台设备更新。',
+'sync.export': '导出数据',
+'sync.import': '导入数据',
+'sync.exported': '数据已导出。',
+'sync.importConfirm': '要用导入的文件替换当前所有数据吗？此操作无法撤销。',
+'sync.imported': '数据已导入。',
+'sync.importFailed': '无法读取该文件——请确认它是 YTXTube 导出的文件。',
+'sync.exportImport': '将数据转移到另一台设备',
+'sync.exportImportSub': '导出一个 JSON 文件，然后在另一台设备上导入。',
+'common.live': '直播中',
+'common.upcoming': '尚未开播',
+'common.premieresAt': '将于 {time} • {date} 开播',
+'status.loadingMore': '正在加载更多视频…',
+'status.loadMoreError': '无法加载更多——请检查网络连接。',
+'watch.backToLive': '回到直播',
+'watch.liveEnded': '这场直播已结束。',
+'watch.wentLive': '这场直播正在进行中。',
 };
 I18N.ja = {
 'toast.subscribed': '{name} に登録しました。',
@@ -674,7 +1214,7 @@ I18N.ja = {
 'settings.autoplayNext': '次の動画を自動再生', 'settings.autoplayNextSub': 'この動画が終わったら次の関連動画を再生する',
 'settings.playbackQuality': '再生画質', 'settings.storageUsage': 'ストレージ使用量', 'settings.clearCache': 'キャッシュを消去',
 'settings.version': 'バージョン', 'settings.accounts': 'アカウント',
-'settings.accountsSub': 'このビルドにはGoogleログインがありません — 登録はこのデバイスにのみ保存されます。',
+'settings.accountsSub': '上のアバターボタンからログインしてください。GoogleログインにはクライアントIDが必要です — README参照；メールプロフィールはこのデバイスにのみ保存されます。',
 'sb.sponsor': 'スポンサー', 'sb.intro': 'イントロ', 'sb.outro': 'エンディングとクレジット', 'sb.selfpromo': '自己宣伝',
 'sb.interaction': '高評価と登録のお願い', 'sb.musicOfftopic': 'ミュージックビデオの音楽以外の部分',
 'toast.searchFailed': '検索に失敗しました — 接続を確認して再試行してください。',
@@ -682,6 +1222,51 @@ I18N.ja = {
 'toast.savedAdded': '保存しました — 「保存済み」タブで確認できます。', 'toast.savedRemoved': '保存済みから削除しました。',
 'status.noVideos': '動画が見つかりませんでした。', 'status.noMore': 'これ以上動画はありません — 別のフィルターを試してください。',
 'status.loadingTrending': 'トレンドを読み込み中…',
+'profile.title': 'ログイン',
+'profile.myProfile': 'マイプロフィール',
+'profile.nameLabel': '表示名',
+'profile.namePlaceholder': 'あなたの名前…',
+'profile.avatarLabel': 'アバターを選ぶ',
+'profile.signIn': 'ログイン',
+'profile.signOut': 'ログアウト',
+'profile.localNote': 'メールプロフィールはこのデバイスにのみ保存されます — 実際のGoogle/YouTubeアカウントではありません。',
+'profile.nameRequired': 'まず表示名を入力してください。',
+'profile.signedIn': '{name} としてログインしました。',
+'profile.signedOut': 'ログアウトしました。',
+'profile.emailLabel': 'メールアドレス',
+'profile.emailPlaceholder': 'you@example.com',
+'profile.emailInvalid': '有効なメールアドレスを入力してください。',
+'profile.googleButton': 'Googleで続ける',
+'profile.googleNotConfigured': 'Googleログインはまだ設定されていません — アプリ設定にGoogleクライアントIDを追加してください（README参照）。',
+'profile.googleFailed': 'Googleログインに失敗しました — もう一度お試しください。',
+'profile.or': 'または',
+'profile.methodEmail': 'メール',
+'profile.methodGoogle': 'Google',
+'profile.seeded': 'このデバイスのデータがこのアカウントにコピーされました。',
+'profile.dataNote': 'このアカウントの履歴、高評価、登録、設定は別々に保存されます。',
+'sync.title': 'クラウド同期',
+'sync.off': 'クラウド同期：未設定',
+'sync.on': 'クラウド同期：オン',
+'sync.error': 'クラウド同期エラー — ローカルデータを使用しています。',
+'sync.lastSync': '最終同期 {time}',
+'sync.signInToSync': 'デバイス間で同期するにはログインしてください。',
+'sync.updated': '別のデバイスから更新されました。',
+'sync.export': 'データを書き出す',
+'sync.import': 'データを読み込む',
+'sync.exported': 'データを書き出しました。',
+'sync.importConfirm': '現在のデータをすべてインポートしたファイルで置き換えますか？元に戻せません。',
+'sync.imported': 'データを読み込みました。',
+'sync.importFailed': 'そのファイルを読み込めませんでした — YTXTubeの書き出しファイルか確認してください。',
+'sync.exportImport': 'データを別のデバイスへ移す',
+'sync.exportImportSub': 'JSONファイルを書き出し、別のデバイスで読み込んでください。',
+'common.live': 'ライブ',
+'common.upcoming': '未配信',
+'common.premieresAt': '{date} {time} に配信開始',
+'status.loadingMore': 'さらに読み込み中…',
+'status.loadMoreError': 'さらに読み込めませんでした — 接続を確認してください。',
+'watch.backToLive': 'ライブに戻る',
+'watch.liveEnded': 'このライブ配信は終了しました。',
+'watch.wentLive': 'この配信は現在ライブ中です。',
 };
 I18N.ko = {
 'toast.subscribed': '{name}을(를) 구독했습니다.',
@@ -805,7 +1390,7 @@ I18N.ko = {
 'settings.autoplayNext': '다음 동영상 자동 재생', 'settings.autoplayNextSub': '이 동영상이 끝나면 다음 관련 동영상을 재생',
 'settings.playbackQuality': '재생 화질', 'settings.storageUsage': '저장 공간 사용량', 'settings.clearCache': '캐시 지우기',
 'settings.version': '버전', 'settings.accounts': '계정',
-'settings.accountsSub': '이 빌드에는 Google 로그인이 없습니다 — 구독은 이 기기에만 저장됩니다.',
+'settings.accountsSub': '상단의 아바타 버튼으로 로그인하세요. Google 로그인에는 클라이언트 ID가 필요합니다 — README 참조；이메일 프로필은 이 기기에만 저장됩니다.',
 'sb.sponsor': '스폰서', 'sb.intro': '인트로', 'sb.outro': '아웃트로 및 크레딧', 'sb.selfpromo': '자기 홍보',
 'sb.interaction': '좋아요 및 구독 알림', 'sb.musicOfftopic': '뮤직비디오의 음악이 아닌 부분',
 'toast.searchFailed': '검색에 실패했습니다 — 연결을 확인하고 다시 시도하세요.',
@@ -813,6 +1398,51 @@ I18N.ko = {
 'toast.savedAdded': '저장했습니다 — 저장됨 탭에서 확인하세요.', 'toast.savedRemoved': '저장됨에서 삭제했습니다.',
 'status.noVideos': '동영상을 찾을 수 없습니다.', 'status.noMore': '더 이상 동영상이 없습니다 — 다른 필터를 시도하세요.',
 'status.loadingTrending': '인기 동영상을 불러오는 중…',
+'profile.title': '로그인',
+'profile.myProfile': '내 프로필',
+'profile.nameLabel': '표시 이름',
+'profile.namePlaceholder': '이름…',
+'profile.avatarLabel': '아바타 선택',
+'profile.signIn': '로그인',
+'profile.signOut': '로그아웃',
+'profile.localNote': '이메일 프로필은 이 기기에만 저장됩니다 — 실제 Google/YouTube 계정이 아닙니다.',
+'profile.nameRequired': '표시 이름을 먼저 입력하세요.',
+'profile.signedIn': '{name}(으)로 로그인했습니다.',
+'profile.signedOut': '로그아웃했습니다.',
+'profile.emailLabel': '이메일',
+'profile.emailPlaceholder': 'you@example.com',
+'profile.emailInvalid': '유효한 이메일 주소를 입력하세요.',
+'profile.googleButton': 'Google로 계속하기',
+'profile.googleNotConfigured': 'Google 로그인이 아직 설정되지 않았습니다 — 앱 설정에 Google 클라이언트 ID를 추가하세요(README 참조).',
+'profile.googleFailed': 'Google 로그인에 실패했습니다 — 다시 시도하세요.',
+'profile.or': '또는',
+'profile.methodEmail': '이메일',
+'profile.methodGoogle': 'Google',
+'profile.seeded': '이 기기의 데이터가 이 계정에 복사되었습니다.',
+'profile.dataNote': '이 계정의 기록, 좋아요, 구독 및 설정은 별도로 저장됩니다.',
+'sync.title': '클라우드 동기화',
+'sync.off': '클라우드 동기화: 설정되지 않음',
+'sync.on': '클라우드 동기화: 켜짐',
+'sync.error': '클라우드 동기화 오류 — 로컬 데이터를 사용 중입니다.',
+'sync.lastSync': '마지막 동기화 {time}',
+'sync.signInToSync': '기기 간 동기화하려면 로그인하세요.',
+'sync.updated': '다른 기기에서 업데이트되었습니다.',
+'sync.export': '데이터 내보내기',
+'sync.import': '데이터 가져오기',
+'sync.exported': '데이터를 내보냈습니다.',
+'sync.importConfirm': '현재 데이터를 가져온 파일로 모두 바꾸시겠습니까? 되돌릴 수 없습니다.',
+'sync.imported': '데이터를 가져왔습니다.',
+'sync.importFailed': '파일을 읽을 수 없습니다 — YTXTube에서 내보낸 파일인지 확인하세요.',
+'sync.exportImport': '다른 기기로 데이터 이동',
+'sync.exportImportSub': 'JSON 파일을 내보낸 뒤 다른 기기에서 가져오세요.',
+'common.live': '라이브',
+'common.upcoming': '아직 방송 전',
+'common.premieresAt': '{date} {time}에 방송 시작',
+'status.loadingMore': '동영상을 더 불러오는 중…',
+'status.loadMoreError': '더 불러올 수 없습니다 — 연결을 확인하세요.',
+'watch.backToLive': '라이브로 돌아가기',
+'watch.liveEnded': '이 라이브 방송이 종료되었습니다.',
+'watch.wentLive': '이 방송이 지금 라이브 중입니다.',
 };
 
 // ---------- Ngôn ngữ hiện tại ----------
@@ -882,6 +1512,7 @@ function applyI18n() {
   updateChannelHeadSubBtn();
   syncSettingsUI();
   document.querySelectorAll('#langSeg button').forEach((b) => b.classList.toggle('active', b.dataset.lang === langSetting));
+  syncProfileUI(); // avatar header + bảng hồ sơ theo ngôn ngữ mới
   // Status text that is currently shown (feed empty / loading) is re-set in
   // English only when a new load happens; live strings above cover the UI.
 }
@@ -963,9 +1594,76 @@ const compactCount = (n) => {
 };
 const fmtDur = (s) => {
   if (!s && s !== 0) return '';
+  if (s < 0) return ''; // duration âm (live = -1) không bao giờ hiện "-1:-1:-1"
   const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
   return h ? `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}` : `${m}:${String(sec).padStart(2, '0')}`;
 };
+// fmtDur giữ nguyên: fmtDur(0) = "0:00" (nhạc bắt đầu từ 0). fmtDur(-1)
+// KHÔNG được dùng cho huy hiệu nữa — durationBadge xử lý duration -1.
+
+// ---------- Live / sắp chiếu / ngày đăng tuyệt đối ----------
+// Piped trả livestream với duration = -1 và uploaded = -1 (không có
+// isLive/isUpcoming trong dữ liệu danh sách). Vì vậy, từ dữ liệu danh
+// sách KHÔNG phân biệt được "đang live" và "sắp chiếu": duration -1
+// luôn hiện "Trực tiếp", trừ khi uploaded là thời gian trong tương lai
+// (lúc đó hiện giờ công chiếu). Không bao giờ hiện "-1:-1" hay "-1:-1:-1".
+function liveState(v) {
+  if (!v) return null;
+  const up = Number(v.uploaded);
+  if (up && up > Date.now()) return 'upcoming'; // công chiếu trong tương lai
+  if (v.isUpcoming) return 'upcoming';
+  if (v.isLive) return 'live';
+  if (v.duration === -1 || v.duration === '-1') return 'live';
+  if (v.uploadedDate && new Date(v.uploadedDate).getTime() > Date.now()) return 'upcoming';
+  return null;
+}
+function fmtDate(ts) {
+  // Ngày đăng tuyệt đối theo locale của máy. uploaded không hợp lệ
+  // (<= 0 hoặc quá khứ xa bất thường như 1970) → ẩn, không hiện số năm sai.
+  const n = Number(ts);
+  if (!n || n <= 0 || n < 946684800000) return ''; // trước 01/01/2000: dữ liệu lỗi
+  const d = new Date(n);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString(langLocale());
+}
+function fmtPremiere(ts) {
+  const n = Number(ts);
+  if (!n || n <= 0) return t('common.upcoming');
+  const d = new Date(n);
+  if (isNaN(d.getTime())) return t('common.upcoming');
+  return t('common.premieresAt', { time: d.toLocaleTimeString(langLocale(), { hour: '2-digit', minute: '2-digit' }), date: d.toLocaleDateString(langLocale()) });
+}
+function durationBadge(v) {
+  const st = liveState(v);
+  if (st === 'live') return `<span class="duration live">${esc(t('common.live'))}</span>`;
+  if (st === 'upcoming') return `<span class="duration live">${esc(t('common.upcoming'))}</span>`;
+  const d = typeof v.duration === 'number' ? v.duration : parseDuration(v.duration);
+  return d > 0 ? `<span class="duration">${fmtDur(d)}</span>` : '';
+}
+function videoDateText(v) {
+  // Dòng meta dưới video: ngày tuyệt đối; sắp chiếu → giờ công chiếu;
+  // live → "Trực tiếp"; ngày lỗi → ẩn phần ngày.
+  const st = liveState(v);
+  if (st === 'upcoming') {
+    const up = Number(v.uploaded) || (v.uploadedDate ? new Date(v.uploadedDate).getTime() : 0);
+    return fmtPremiere(up);
+  }
+  if (st === 'live') return t('common.live');
+  return fmtDate(v.uploaded);
+}
+function watchMetaDate(data) {
+  // Màn xem: ngày đăng tuyệt đối; live → "Trực tiếp"; sắp chiếu → giờ công chiếu.
+  if (!data) return '';
+  if (data.livestream) return t('common.live');
+  const ts = data.uploadDate ? new Date(data.uploadDate).getTime() : 0;
+  if (ts && ts > Date.now()) return fmtPremiere(ts);
+  return fmtDate(ts);
+}
+function shortsMetaText(v) {
+  const sd = parseDuration(v.duration);
+  const dt = videoDateText(v);
+  return fmtViews(v.views) + (sd > 0 ? ' • ' + fmtDur(sd) : '') + (dt ? ' • ' + dt : '');
+}
 const timeAgo = (ts) => {
   if (!ts) return '';
   const d = Math.floor((Date.now() - ts) / 86400000);
@@ -1035,52 +1733,134 @@ function cardHTML(v) {
   const thumb = v.thumbnail || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`;
   const channel = v.uploaderName || v.uploader || '';
   const avatar = v.uploaderAvatar || `https://api.dicebear.com/7.x/identicon/svg?seed=${encodeURIComponent(channel || 'YT')}`;
+  const dateText = videoDateText(v);
   return `<article class="card" data-id="${esc(id)}">
     <div class="thumb"><img src="${esc(thumb)}" alt="" loading="lazy" referrerpolicy="no-referrer">
-      ${v.duration ? `<span class="duration">${fmtDur(v.duration)}</span>` : ''}</div>
+      ${durationBadge(v)}</div>
     <div class="card-body">
       <img class="card-avatar" src="${esc(avatar)}" alt="" loading="lazy" referrerpolicy="no-referrer">
       <div class="card-text">
         <h3>${esc(v.title)}</h3>
-        <div class="meta">${esc(channel)} • ${fmtViews(v.views)}${v.uploaded ? ' • ' + timeAgo(v.uploaded) : ''}</div>
+        <div class="meta">${esc(channel)} • ${fmtViews(v.views)}${dateText ? ' • ' + esc(dateText) : ''}</div>
       </div>
       <button class="card-menu" data-menu="${esc(id)}" aria-label="More options">⋮</button>
     </div>
   </article>`;
 }
+// ---------- Feed tải liên tục (không giới hạn) ----------
+// Piped /trending chỉ trả một danh sách cố định. Khi danh sách hiện tại
+// đã vẽ hết, tự tải thêm từ các nguồn khác (xoay vòng tìm kiếm phổ biến /
+// trending khu vực khác), loại trùng id đã hiện. Tìm kiếm dùng token
+// nextpage của Piped /search. Chỉ hiện "Hết video" khi đã thử nhiều nguồn
+// mà vẫn không còn gì (hiếm). Lỗi mạng → nút thử lại, không tự dừng feed.
+let feedMode = 'feed'; // 'feed' | 'search' | 'channel'
+let feedLoadingMore = false;
+let feedLoadError = false;
+let feedExhausted = false;
+let seenFeedIds = new Set();
+let searchQuery = '';
+let searchNextPage = null;
+let supplementIdx = 0;
+let subSupplementOffset = 0;
+const SUPPLEMENT_SOURCES = [
+  { kind: 'search', q: 'nhạc' },
+  { kind: 'trending', region: 'US' },
+  { kind: 'search', q: 'game' },
+  { kind: 'search', q: 'thể thao' },
+  { kind: 'trending', region: 'JP' },
+  { kind: 'search', q: 'tin tức' },
+  { kind: 'search', q: 'ẩm thực' },
+  { kind: 'trending', region: 'GB' },
+  { kind: 'search', q: 'du lịch' },
+  { kind: 'search', q: 'hài' },
+];
 function renderBatch() {
   const next = feed.slice(rendered, rendered + 12);
   grid.insertAdjacentHTML('beforeend', next.map(cardHTML).join(''));
   rendered += next.length;
-  showStatus(rendered >= feed.length
-    ? (feed.length ? t('status.noMore') : '')
-    : '');
+  if (rendered >= feed.length) {
+    if (feedExhausted) showStatus(feed.length ? t('status.noMore') : '');
+    else loadMoreFeed(); // còn nguồn khác: tự tải tiếp (hiện spinner)
+  } else showStatus('');
 }
-function showFeed(list) {
+function showFeed(list, mode = 'feed') {
   feed = list; rendered = 0;
+  feedMode = mode; feedExhausted = false; feedLoadingMore = false; feedLoadError = false;
+  supplementIdx = 0; subSupplementOffset = 0;
+  seenFeedIds = new Set(list.map((v) => videoId(v)).filter(Boolean));
   grid.innerHTML = '';
+  if (mode === 'channel') feedExhausted = true; // video của 1 kênh: hết là hết, không bổ sung video lạ
   if (!list.length) { showStatus(t('status.noVideos')); return; }
   renderBatch();
+}
+function appendFeedItems(items) {
+  for (const v of items) seenFeedIds.add(videoId(v));
+  feed = feed.concat(items);
+  renderBatch();
+}
+async function loadMoreFeed() {
+  if (feedLoadingMore || feedExhausted) return;
+  feedLoadingMore = true; feedLoadError = false;
+  showStatus(`<div class="spinner"></div>${esc(t('status.loadingMore'))}`);
+  try {
+    if (feedMode === 'search') {
+      if (!searchNextPage) { feedExhausted = true; showStatus(feed.length ? t('status.noMore') : ''); return; }
+      const data = await piped(`/search?q=${encodeURIComponent(searchQuery)}&filter=videos&nextpage=${encodeURIComponent(searchNextPage)}`);
+      searchNextPage = data.nextpage || null;
+      const items = (data.items || []).filter((v) => videoId(v) && !seenFeedIds.has(videoId(v)));
+      appendFeedItems(items);
+      if (!searchNextPage) feedExhausted = true;
+    } else {
+      // Feed / chip: xoay vòng nguồn bổ sung, lọc đúng chip đang chọn.
+      let added = 0, tried = 0;
+      while (tried < SUPPLEMENT_SOURCES.length + 3 && added === 0) {
+        tried++;
+        let items = [];
+        try {
+          if (currentCategory === 'subscribed') {
+            if (subSupplementOffset >= subscribed.size) break;
+            items = await fetchSubscribedVideos(subSupplementOffset);
+            subSupplementOffset += 3;
+          } else {
+            const src = SUPPLEMENT_SOURCES[supplementIdx % SUPPLEMENT_SOURCES.length];
+            supplementIdx++;
+            if (src.kind === 'trending') {
+              const data = await piped(`/trending?region=${src.region}`);
+              items = data || [];
+            } else {
+              const data = await piped(`/search?q=${encodeURIComponent(src.q)}&filter=videos`);
+              items = data.items || [];
+            }
+          }
+        } catch { continue; }
+        items = items.filter((v) => videoId(v) && !seenFeedIds.has(videoId(v)));
+        if (currentCategory && currentCategory !== 'all') items = applyHomeFilterTo(currentCategory, items);
+        if (items.length) { appendFeedItems(items); added = items.length; }
+      }
+      if (!added) { feedExhausted = true; showStatus(feed.length ? t('status.noMore') : ''); }
+    }
+  } catch {
+    feedLoadError = true;
+    showStatus(`<button class="pill" data-feed-retry>${esc(t('status.loadMoreError'))} ${esc(t('common.tryAgain'))}</button>`);
+  } finally {
+    feedLoadingMore = false;
+    if (feedLoadError) { /* giữ nút thử lại, không tự chạy lại */ }
+    else if (!feedExhausted && rendered >= feed.length) loadMoreFeed();
+    else if (!feedExhausted) showStatus('');
+  }
+}
+// Lọc một danh sách bất kỳ theo chip (dùng cho cả trending gốc lẫn nguồn bổ sung).
+function applyHomeFilterTo(filter, list) {
+  if (filter === 'today') return list.filter((v) => !v.uploaded || Date.now() - v.uploaded < 86400000);
+  if (filter === 'videos') return list.filter((v) => (v.duration ?? 0) > 0);
+  if (filter === 'live') return list.filter((v) => v.duration === -1 || /live/i.test(v.title || ''));
+  if (filter === 'subscribed') return list.filter((v) => subscribed.has(v.uploaderName || v.uploader || ''));
+  return list;
 }
 
 // ---------- Feed ----------
 // Android HomeFilter, applied client-side over one trending fetch.
-function applyHomeFilter(filter) {
-  const list = trendingRaw;
-  if (filter === 'today') {
-    return list.filter((v) => !v.uploaded || Date.now() - v.uploaded < 86400000);
-  }
-  if (filter === 'videos') {
-    return list.filter((v) => (v.duration ?? 0) > 0);
-  }
-  if (filter === 'live') {
-    return list.filter((v) => v.duration === -1 || /live/i.test(v.title || ''));
-  }
-  if (filter === 'subscribed') {
-    return list.filter((v) => subscribed.has(v.uploaderName || v.uploader || ''));
-  }
-  return list;
-}
+function applyHomeFilter(filter) { return applyHomeFilterTo(filter, trendingRaw); }
 async function loadTrending() {
   currentCategory = 'all';
   $('channelHead').hidden = true;
@@ -1109,13 +1889,14 @@ async function loadCategory(cat) {
     }
     // Trending has nothing from subscribed channels — fetch per channel.
     spinner(t('status.loadingSubs'));
-    const subVideos = await fetchSubscribedVideos();
+    const subVideos = await fetchSubscribedVideos(0);
     if (!subVideos.length) {
       showFeed([]);
       showStatus(t('status.noRecentSubs'));
       return;
     }
     showFeed(personalise(subVideos));
+    subSupplementOffset = 3; // lần tải thêm tiếp theo bắt đầu từ kênh thứ 4 (showFeed reset về 0)
     return;
   }
   showFeed(personalise(filtered));
@@ -1133,7 +1914,9 @@ async function doSearch(q) {
   try {
     const data = await piped(`/search?q=${encodeURIComponent(query)}&filter=videos`);
     const items = (data.items || []).filter((v) => videoId(v));
-    showFeed(items);
+    showFeed(items, 'search');
+    searchQuery = query;
+    searchNextPage = data.nextpage || null;
     document.querySelectorAll('.chip').forEach((c) => c.classList.remove('active'));
   } catch {
     toast(t('toast.searchFailed'));
@@ -1147,7 +1930,9 @@ function stopPlayer() {
   try { if (player && player.destroy) player.destroy(); } catch { /* bỏ qua */ }
   player = null;
   playerPlaying = false;
+  watchId = null;
   stopPlaybackTick();
+  stopWatchTick();
 }
 function mountPlayer(id) {
   const wrap = $('playerWrap');
@@ -1164,15 +1949,23 @@ function mountPlayer(id) {
           updateMiniPlayBtn();
           if (e.data === 1) {
             refreshQualityLabel();
+            // Live đã kết thúc rồi phát lại (xem lại dạng VOD): chạy lại đồng hồ.
+            if ($('watch').classList.contains('open') && !watchTickTimer) startWatchTick();
             if (historySavedFor !== id) {
               historySavedFor = id;
               if (currentVideo) rememberWatch(currentVideo, currentCategory);
             }
           }
-          // Ended: autoplay the next related video (Settings toggle).
-          if (e.data === 0 && appSettings.autoplayNext) {
-            const n = relatedList[0];
-            if (n) openVideo(videoId(n));
+          // Ended: live thì hiện trạng thái đã kết thúc (không autoplay —
+          // luồng đã hết, không còn "video tiếp theo" của chính luồng đó).
+          if (e.data === 0) {
+            if (watchIsLive) {
+              $('watchLiveEnded').hidden = false;
+              stopWatchTick();
+            } else if (appSettings.autoplayNext) {
+              const n = relatedList[0];
+              if (n) openVideo(videoId(n));
+            }
           }
         },
       },
@@ -1210,7 +2003,9 @@ async function openVideo(id, opts = {}) {
   $('moreBtn').hidden = true;
   $('relatedGrid').innerHTML = '';
   $('comments').innerHTML = `<div class="status"><div class="spinner"></div>${esc(t('watch.loadingComments'))}</div>`;
+  watchId = id;
   mountPlayer(id);
+  startWatchTick();
 
   try {
     const data = await piped(`/streams/${id}`);
@@ -1219,10 +2014,13 @@ async function openVideo(id, opts = {}) {
       thumbnail: data.thumbnailUrl || `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
       likes: data.likes || 0, dislikes: data.dislikes || 0,
       uploaderAvatar: data.uploaderAvatar || '', uploaderUrl: data.uploaderUrl || '',
+      livestream: !!data.livestream,
     };
+    if (data.livestream) watchIsLive = true;
     $('watchTitle').textContent = data.title || '';
+    const watchDate = watchMetaDate(data);
     $('watchMeta').textContent =
-      `${fmtViews(data.views)} • ${data.uploadDate ? new Date(data.uploadDate).toLocaleDateString(langLocale()) : ''} • ${formatCount(data.likes, '0')} ${t('common.likes')}`;
+      `${fmtViews(data.views)}${watchDate ? ' • ' + watchDate : ''} • ${formatCount(data.likes, '0')} ${t('common.likes')}`;
     $('channelName').textContent = data.uploader || '';
     $('channelSubs').textContent = data.uploaderSubscriberCount
       ? `${formatCount(data.uploaderSubscriberCount)} ${t('common.subscribers')}` : '';
@@ -1282,6 +2080,7 @@ function closeVideo(minimize = false) {
   if (minimize && player) {
     // Background playback OFF: leaving the player stops it for real.
     if (!appSettings.bgPlayback) { closeVideo(false); return; }
+    stopWatchTick();
     stopLyricsPolling();
     closeLyrics();
     historySavedFor = null;
@@ -1324,6 +2123,77 @@ function closeVideo(minimize = false) {
   document.querySelector('.comments').classList.remove('drawer-open');
 }
 
+// ---------- Đồng hồ xem video theo thời gian thực (tick 1 giây) ----------
+// Một vòng tick chung cho cả video thường (VOD) và live: đọc
+// getCurrentTime()/getDuration() từ YT.Player, cập nhật đồng hồ + thanh
+// tiến trình mỗi giây; tua thì tick sau (≤ 1 giây) cập nhật; tạm dừng thì
+// đồng hồ dừng đúng chỗ. Live khác VOD ở: huy hiệu TRỰC TIẾP + nút
+// "Quay lại trực tiếp" (DVR); VOD có tổng thời lượng cố định.
+// Live: getDuration() trả về Infinity (tài liệu YT.Player). Mở live là
+// phát ngay tại live edge (embed autoplay); tua lại phía sau thì hiện nút
+// quay về live edge. SponsorBlock được bỏ qua cho live (xem checkSbFor).
+let watchId = null;          // id video đang mở trong màn xem
+let watchIsLive = false;     // đã xác định video này đang live (dính, kể cả khi luồng kết thúc)
+let watchTickTimer = null;
+let watchLiveMax = 0;        // vị trí live xa nhất đã thấy (để biết đang tụt lại)
+let watchWentLiveToasted = false;
+function isLiveVideo() {
+  if (!watchId) return false;
+  if (watchIsLive) return true;
+  try { if (player && player.getDuration && player.getDuration() === Infinity) return true; } catch { /* ignore */ }
+  const cv = currentVideo && currentVideo.id === watchId ? currentVideo : null;
+  return !!(cv && (cv.livestream || liveState(cv) === 'live' || cv._wentLive));
+}
+function startWatchTick() {
+  stopWatchTick();
+  watchIsLive = false; watchLiveMax = 0; watchWentLiveToasted = false;
+  const we = $('watchLiveEnded'); if (we) we.hidden = true;
+  const wt = $('watchTime'); if (wt) wt.hidden = !player; // chưa có YT API (iframe dự phòng): embed tự có đồng hồ riêng
+  if (!player) return;
+  watchTickTimer = setInterval(watchTick, 1000);
+  watchTick();
+}
+function stopWatchTick() { if (watchTickTimer) { clearInterval(watchTickTimer); watchTickTimer = null; } }
+function watchTick() {
+  if (!player || !$('watch').classList.contains('open')) return;
+  let cur = 0, dur = 0, state = -1;
+  try { cur = player.getCurrentTime() || 0; } catch { /* ignore */ }
+  try { dur = player.getDuration() || 0; } catch { /* ignore */ }
+  try { state = player.getPlayerState(); } catch { /* ignore */ }
+  const cv = currentVideo && currentVideo.id === watchId ? currentVideo : null;
+  // Video sắp chiếu vừa lên sóng: player bắt đầu phát (state PLAYING).
+  if (cv && liveState(cv) === 'upcoming' && state === 1) {
+    cv._wentLive = true; watchIsLive = true;
+    if (!watchWentLiveToasted) { watchWentLiveToasted = true; toast(t('watch.wentLive')); }
+  }
+  const live = isLiveVideo();
+  if (live) watchIsLive = true;
+  $('watchLiveBadge').hidden = !live;
+  if (live) {
+    $('watchCur').textContent = fmtDur(Math.floor(cur));
+    $('watchDur').textContent = t('common.live');
+    if (state === 1 && cur > watchLiveMax) watchLiveMax = cur;
+    $('watchProgressBar').style.width = watchLiveMax > 0 ? Math.min(100, (cur / watchLiveMax) * 100) + '%' : '100%';
+    // Đang tụt lại phía sau live edge > 10 giây (DVR) → hiện nút quay về.
+    $('watchBackToLiveBtn').hidden = !(state === 1 && watchLiveMax - cur > 10);
+  } else {
+    $('watchCur').textContent = fmtDur(Math.floor(cur));
+    $('watchDur').textContent = (dur && Number.isFinite(dur) && dur > 0) ? fmtDur(Math.floor(dur)) : '';
+    $('watchProgressBar').style.width = (dur && Number.isFinite(dur) && dur > 0) ? Math.min(100, (cur / dur) * 100) + '%' : '0%';
+    $('watchBackToLiveBtn').hidden = true;
+  }
+}
+function jumpToLiveEdge() {
+  if (!player) return;
+  try {
+    const dur = player.getDuration();
+    // Live: duration = Infinity → seek tới số rất lớn, player tự kẹp về live edge.
+    player.seekTo(Number.isFinite(dur) && dur > 0 ? dur : 1e9, true);
+    player.playVideo();
+  } catch { /* ignore */ }
+  $('watchBackToLiveBtn').hidden = true;
+}
+
 // ---------- Bottom tabs (Android v2.2.0 order: Home | Music | Shorts | Library | Saved) ----------
 function setActiveTab(name) {
   const map = { home: 'homeNavBtn', music: 'musicNavBtn', shorts: 'shortsNavBtn', library: 'libraryNavBtn', saved: 'savedNavBtn' };
@@ -1331,6 +2201,7 @@ function setActiveTab(name) {
   if (map[name]) $(map[name]).classList.add('active');
 }
 function hideAllSections() {
+  stopWatchTick();
   $('home').classList.add('hidden');
   $('watch').classList.remove('open');
   $('watch').hidden = true;
@@ -1590,7 +2461,7 @@ function shortsSlideHTML(v) {
           <button class="shorts-subscribe" data-action="subscribe" data-id="${esc(id)}" data-channel="${esc(channel)}">${subscribed.has(channel) ? t('watch.subscribed') : t('watch.subscribe')}</button>
         </div>
         <h3 class="shorts-title-text">${esc(title)}</h3>
-        <div class="shorts-meta">${fmtViews(v.views)}${v.duration ? ' • ' + fmtDur(parseDuration(v.duration)) : ''}</div>
+        <div class="shorts-meta">${shortsMetaText(v)}</div>
         <div class="shorts-music">♫ Shorts</div>
       </div>
       <div class="shorts-rail">
@@ -2469,6 +3340,8 @@ async function fetchSB(id) {
 }
 function checkSbFor(p, id) {
   if (!p || !id || !sbSettings.enabled) return;
+  // Live: không có đoạn sponsor cố định → bỏ qua (duration = Infinity).
+  try { if (p.getDuration && p.getDuration() === Infinity) return; } catch { /* ignore */ }
   const segs = sbCache.get(id);
   if (!segs || !segs.length) return;
   let t = 0;
@@ -2498,7 +3371,10 @@ function playbackTick() {
 function ensurePlaybackTick() { if (!playbackTimer) playbackTimer = setInterval(playbackTick, 250); }
 function stopPlaybackTick() { if (playbackTimer) { clearInterval(playbackTimer); playbackTimer = null; } }
 
-// ---------- Subscriptions (local, no Google login) ----------
+// ---------- Subscriptions (lưu local theo tài khoản) ----------
+// Đăng nhập Google qua GIS không cấp quyền đọc YouTube (không có YouTube
+// Data API), nên subscriptions vẫn lưu local theo tài khoản, đồng bộ qua
+// Firebase / xuất-nhập file như các dữ liệu khác.
 // `subscribed` (Set tên kênh, đã có từ v1) giữ nguyên để tương thích;
 // `subMeta` thêm avatar + channelId để mở được video của kênh đó.
 let subMeta = store.get('subMeta', {}); // name -> {avatar, channelId, subscribedAt}
@@ -2553,12 +3429,12 @@ async function openChannel(name) {
     } catch { /* ignore */ }
   }
   if (!items.length) { showFeed([]); showStatus(t('status.noVideosChannel', { name })); return; }
-  showFeed(items.slice(0, 24));
+  showFeed(items.slice(0, 24), 'channel');
 }
-async function fetchSubscribedVideos() {
+async function fetchSubscribedVideos(offset = 0) {
   const out = [];
   const seen = new Set();
-  for (const name of [...subscribed].slice(0, 3)) {
+  for (const name of [...subscribed].slice(offset, offset + 3)) {
     try {
       const cid = subMeta[name] && subMeta[name].channelId;
       const data = await piped(`/search?q=${encodeURIComponent(name)}&filter=videos`);
@@ -2597,6 +3473,7 @@ function syncSettingsUI() {
   $('sbToggle').checked = !!sbSettings.enabled;
   $('settingsQualitySub').textContent = t('settings.playbackQualitySub', { label: qualityLabelFor(qualityLock) });
   renderSbCategories();
+  updateCloudStatusUI();
 }
 function openSettings() {
   if ($('watch').classList.contains('open')) closeVideo(true);
@@ -2605,6 +3482,7 @@ function openSettings() {
   hideAllSections();
   $('settings-view').hidden = false;
   $('settingsStorageInfo').textContent = $('storageInfo').textContent;
+  updateCloudStatusUI();
   document.querySelectorAll('.bottom-nav-btn').forEach((b) => b.classList.remove('active'));
   window.scrollTo({ top: 0 });
 }
@@ -2617,7 +3495,8 @@ function closeSettings() {
 }
 function clearCache() {
   // Only cache keys — liked / saved / downloads / subscriptions stay.
-  ['history', 'prefWords', 'shortsSeen'].forEach((k) => { try { localStorage.removeItem('ytxtube:' + k); } catch { /* ignore */ } });
+  // Xóa đúng bộ key của hồ sơ đang dùng (store.remove theo scope).
+  ['history', 'prefWords', 'shortsSeen'].forEach((k) => store.remove(k));
   history = []; prefWords = {}; shortsSeen = new Set();
   renderStorage();
   toast(t('toast.cacheCleared'));
@@ -2660,7 +3539,7 @@ $('searchToggleBtn').addEventListener('click', () => {
 });
 $('searchBtn').addEventListener('click', () => doSearch($('searchInput').value));
 $('searchInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') doSearch(e.target.value); });
-$('historyBtn').addEventListener('click', openLibrary);
+$('historyBtn').addEventListener('click', openProfileSheet);
 $('likeBtn').addEventListener('click', () => { if (currentVideo) toggleLike(currentVideo.id, currentVideo); });
 $('dislikeBtn').addEventListener('click', () => { if (currentVideo) toggleDislike(currentVideo.id); });
 $('saveBtn').addEventListener('click', () => { if (currentVideo) toggleSave(currentVideo); });
@@ -2687,9 +3566,35 @@ $('downloadList').addEventListener('click', (e) => {
 });
 // Quality + Download sheets: tap the backdrop area (the sheet itself,
 // outside its content) closes it — same pattern as the comments drawer.
-['downloadSheet', 'qualitySheet'].forEach((id) => {
+['downloadSheet', 'qualitySheet', 'profileSheet'].forEach((id) => {
   $(id).addEventListener('click', (e) => { if (e.target === $(id)) $(id).hidden = true; });
 });
+// Profile / sign-in sheet (Google + Email).
+$('profileCloseBtn').addEventListener('click', closeProfileSheet);
+$('profileSignInBtn').addEventListener('click', signInWithEmail);
+$('profileSignOutBtn').addEventListener('click', signOut);
+$('googleSignInBtn').addEventListener('click', () => {
+  if (!GOOGLE_CLIENT_ID) { toast(t('profile.googleNotConfigured')); return; }
+  googleBtnRendered = false; // thử vẽ lại nút Google chính thức
+  renderGoogleButton();
+});
+$('profileAvatarPicker').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-avatar]');
+  if (!b) return;
+  profileAvatarChoice = b.dataset.avatar;
+  renderAvatarPicker();
+});
+$('profileNameInput').addEventListener('input', renderAvatarPicker);
+$('profileEmailInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') signInWithEmail(); });
+$('profileNameInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') signInWithEmail(); });
+// Đồng bộ dữ liệu: xuất / nhập file JSON (xem exportData / importDataFile).
+$('exportDataBtn').addEventListener('click', exportData);
+$('importDataBtn').addEventListener('click', () => $('importFileInput').click());
+$('importFileInput').addEventListener('change', (e) => { importDataFile(e.target.files && e.target.files[0]); e.target.value = ''; });
+// Xem video: quay lại điểm live hiện tại (DVR).
+$('watchBackToLiveBtn').addEventListener('click', jumpToLiveEdge);
+// Feed tải thêm lỗi mạng → nút thử lại trong #status.
+statusEl.addEventListener('click', (e) => { if (e.target.closest('[data-feed-retry]')) loadMoreFeed(); });
 $('mpDownloadBtn').addEventListener('click', () => openDownloadSheet(currentMusic ? currentMusic.video : currentVideo));
 $('shortsQualityBtn').addEventListener('click', openQualitySheet);
 $('dlTabVideos').addEventListener('click', () => { dlTab = 'video'; renderDownloads(); });
@@ -2935,17 +3840,23 @@ $('shortsFeed').addEventListener('scroll', () => {
   if (f.scrollHeight - f.scrollTop - f.clientHeight < 600 && !shortsLoading) loadShorts();
 }, { passive: true });
 
-// Cuộn vô hạn: gần cuối trang thì vẽ thêm 12 thẻ.
+// Cuộn vô hạn: gần cuối trang thì vẽ thêm 12 thẻ; hết thẻ thì tải thêm
+// từ nguồn khác (feed) / trang tiếp theo (tìm kiếm) — không dừng lại.
 window.addEventListener('scroll', () => {
   if ($('watch').classList.contains('open')) return;
   if (!$('shorts-view').hidden) return;
-  if (window.innerHeight + window.scrollY > document.body.scrollHeight - 900 && rendered < feed.length) renderBatch();
+  if (window.innerHeight + window.scrollY > document.body.scrollHeight - 900) {
+    if (rendered < feed.length) renderBatch();
+    else loadMoreFeed();
+  }
 }, { passive: true });
 
 // ---------- Khởi động ----------
 (function init() {
   applySettings(); // theme / Liquid Glass / toggles from localStorage
   applyI18n(); // language from localStorage / device, live re-render (no reload)
+  syncProfileUI(); // avatar trên header theo hồ sơ đã lưu (nếu có)
+  if (profile && firebaseEnabled()) startCloudSync(); // đã đăng nhập: nối lại đồng bộ cloud
   $('chips').addEventListener('click', (e) => {
     const chip = e.target.closest('.chip');
     if (chip) loadCategory(CATEGORIES[Number(chip.dataset.i)]);
