@@ -457,6 +457,26 @@ cộng đồng — video ít người xem có thể không có segment nào.
   mở menu). Đã kiểm tra 6 tình huống dự phòng bằng Piped giả lập, đều
   đạt.
 
+## Biểu tượng giống bản web/app gốc (sửa, 2026-11-15)
+
+- Trước đây nút bấm dùng emoji (🔍 👍 👎 🔖 ⬇ ⚙️ 🎵 💬 ⋮ …), trong
+  khi bản web gốc và app Android đều dùng icon Material (SVG 24x24,
+  `fill="currentColor"`).
+- Giờ mọi nút bấm dùng SVG Material: tìm kiếm, đóng (✕ giữ nguyên
+  như bản gốc), quay lại, ⋮, like/dislike, chia sẻ, tim, lưu
+  (bookmark), tải xuống, cài đặt, nốt nhạc, phát/tạm dừng, tới/lùi,
+  xáo trộn, lặp lại, âm lượng, làm mới, bình luận, trang chủ, thư
+  viện, danh sách phát, tài khoản, quả địa cầu, mũi tên xuống. Các
+  path search/close/back/more-vert/like/dislike/share/heart lấy đúng
+  từ `index.html` bản web gốc; còn lại là path Material chuẩn cùng bộ.
+- Bộ icon nằm trong `ICONS` + hàm `icon()` ở `app.js`; nút tĩnh viết
+  trực tiếp trong `index.html`, nút JS vẽ lại qua `innerHTML` (vì
+  `applyI18n` và các hàm đồng bộ nút vẫn ghi đè nội dung nút). Nhãn
+  i18n (12 khóa × 6 ngôn ngữ) đã bỏ emoji ở đầu, chỉ còn chữ.
+- Còn giữ nguyên: ✕ ở nút đóng (bản gốc cũng dùng ✕), ✓ ở "Đã đăng
+  ký ✓", ♥ trong câu hướng dẫn, và avatar thú (🦊 🐼…) do người dùng
+  tự chọn — đó không phải biểu tượng nút bấm.
+
 ## Chưa có (không port từ bản Android)
 
 PoToken, nhiều tài khoản YouTube, chế độ TV. Những
