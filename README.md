@@ -56,7 +56,7 @@ chính thức; engine tải của v2.2.0 (stream liên tục + resume) là Bư�
 
 Theo changelog v2.2.0 của bản Android ("multiple languages support").
 Web client hỗ trợ **Tiếng Việt, English, Español, 中文 (简体), 日本語,
-한국어** — cả 6 ngôn ngữ đều đầy đủ 219 chuỗi giao diện (nav, chip, trang
+한국어** — cả 6 ngôn ngữ đều đầy đủ 264 chuỗi giao diện (nav, chip, trang
 xem, Shorts, Nhạc + lời, Tải xuống + Chất lượng, SponsorBlock, Library,
 Saved, Settings, toast và thông báo trạng thái). Đổi ngôn ngữ ở
 **Settings → Language** (mặc định System = theo ngôn ngữ máy qua
@@ -251,14 +251,14 @@ thanh tab, có play/pause, next, đóng và vạch tiến độ đỏ.
   player; Autoplay next video: hết video thì tự phát video liên quan tiếp
   theo; Playback quality: hiện mức đã khóa + mở sheet chọn chất lượng),
   SponsorBlock (toggle chung + checkbox từng category, mặc định bật
-  sponsor/intro/outro, tắt các loại còn lại), Data & Storage (dung lượng
-  đã dùng + Clear cache — chỉ xóa history/preferences/seen Shorts, không
-  xóa like/save/download/subscription), About (phiên bản + ghi chú không
-  có đăng nhập Google). Mọi cài đặt lưu trong localStorage và áp lại khi
-  mở app. Chỉ có switch thật sự hoạt động mới được đưa vào — không có
+  sponsor/intro/outro, tắt các loại còn lại), Data & Storage (trạng thái
+  đồng bộ cloud + Xuất/Nhập dữ liệu JSON sang máy khác + dung lượng đã
+  dùng + Clear cache — chỉ xóa history/preferences/seen Shorts, không
+  xóa like/save/download/subscription), About (phiên bản + tài khoản).
+  Mọi cài đặt lưu trong localStorage và áp lại khi mở app. Chỉ có switch thật sự hoạt động mới được đưa vào — không có
   switch giả (vd. Language giờ đã có thật — xem mục "Đa ngôn ngữ" ở trên;
   PiP luôn bật qua wrapper native nên không có switch).
-- **Subscriptions (local, không đăng nhập Google):** nút Subscribe trắng
+- **Subscriptions (lưu local theo tài khoản):** nút Subscribe trắng
   trong trang xem / Shorts giờ lưu thật: tên + avatar + channel ID (lấy
   từ `uploaderUrl` của Piped) + ngày đăng ký trong localStorage. Tab
   Library → Subscriptions liệt kê kèm avatar, bấm vào thì mở video của
@@ -272,18 +272,155 @@ thanh tab, có play/pause, next, đóng và vạch tiến độ đỏ.
 **Giống bản Android:** skip sponsor tự động + toast, Settings có Liquid
 Glass toggle + theme AMOLED + SponsorBlock theo category, Subscriptions
 mở được video của kênh, chip Subscribed lọc thật. **Khác bản Android —
-nói thẳng:** không có đăng nhập Google / nhiều tài khoản (không thể làm
-được nếu không có Google login — subscriptions chỉ lưu trên máy); không
-có chế độ TV; không có ExoPlayer (điều khiển player là embed YouTube);
+nói thẳng:** đăng nhập Google đã có (xem mục Đăng nhập bên dưới) nhưng
+chỉ là GIS — không cấp quyền đọc YouTube (không có YouTube Data API)
+nên subscriptions vẫn lưu local theo tài khoản, không phải theo tài
+khoản YouTube thật; nhiều tài khoản YouTube vẫn chưa có; không có chế
+độ TV; không có ExoPlayer (điều khiển player là embed YouTube);
 SponsorBlock chỉ skip tự động, không có chế độ Ask (hỏi trước khi skip)
 hay Show (chỉ đánh dấu) như Android; SponsorBlock phụ thuộc vào dữ liệu
 cộng đồng — video ít người xem có thể không có segment nào.
 
+## Đăng nhập + dữ liệu theo tài khoản + đồng bộ cloud (mới, 2026-11-15)
+
+### Đăng nhập (nút avatar trên header)
+
+- **Email — dùng được ngay, không cần máy chủ:** nhập email + tên hiển
+  thị + chọn avatar (emoji hoặc chữ cái đầu với màu theo tên), kiểm tra
+  định dạng email, lưu local `{name, email, avatar, method:'email'}`.
+  Giao diện ghi rõ hồ sơ chỉ lưu trên máy.
+- **Google — luồng thật bằng Google Identity Services (GIS):** nạp script
+  GIS, init bằng Client ID, nhận credential (ID token), lấy tên/email/
+  avatar từ payload, lưu profile `method:'google'`. Client ID lấy từ
+  `GOOGLE_CLIENT_ID` ở đầu `app.js`, mặc định để trống. Khi trống, bấm
+  nút Google thì báo rõ "chưa cấu hình Google Client ID" — không giả vờ
+  đăng nhập thành công. **Không có Apple ID** (theo yêu cầu — chỉ Google
+  hoặc Email).
+- Sau khi đăng nhập, header hiện avatar/tên/email đã chọn; bấm avatar mở
+  bảng hồ sơ (tên + avatar + cách đăng nhập, nút Đăng xuất xóa profile
+  về icon mặc định).
+- **Cài đặt Google Client ID (1 lần):** Google Cloud Console
+  (console.cloud.google.com) → tạo project → APIs & Services →
+  Credentials → Create Credentials → OAuth client ID → loại **Web
+  application** → Authorized JavaScript origins thêm domain Vercel
+  (vd. `https://ytxtube-ios-web.vercel.app`) + `http://localhost` →
+  copy Client ID → dán vào `GOOGLE_CLIENT_ID` trong `app.js`.
+- Giới hạn: trong WKWebView của app đã cài, popup Google có thể cần xử
+  lý thêm phía Swift (chưa có) — Google chắc chắn chạy trên link web
+  (Safari). Đăng nhập Google qua GIS **không** cấp quyền đọc YouTube
+  (không có YouTube Data API) nên subscriptions vẫn là local.
+
+### Dữ liệu gắn theo tài khoản (không cần máy chủ)
+
+- Lịch sử xem, video đã thích, kênh đã đăng ký, video đã lưu/tải, cài
+  đặt, ngôn ngữ, chất lượng đã khóa, tùy chọn SponsorBlock… đều lưu
+  theo hồ sơ qua 1 lớp dữ liệu (`store` + `DATA_KEYS` trong `app.js`):
+  chưa đăng nhập dùng key cũ `ytxtube:<key>` (dữ liệu local cũ **không
+  mất** khi cập nhật); đã đăng nhập dùng
+  `ytxtube:acct:<accountId>:<key>` (Google: `g:<sub>`; Email:
+  `e:<hash email>`). Đăng nhập nạp đúng bộ của tài khoản đó, đăng xuất
+  về lại bộ local, đổi tài khoản là đổi bộ dữ liệu.
+- Tài khoản mới đăng nhập lần đầu mà chưa có dữ liệu: app tự copy dữ
+  liệu local trên máy này sang tài khoản đó (1 lần) để lịch sử/đã thích/
+  đăng ký không "biến mất".
+- **Xuất / Nhập dữ liệu (Settings → Data & Storage):** "Xuất dữ liệu"
+  tải xuống 1 file JSON chứa toàn bộ dữ liệu của tài khoản đang dùng;
+  "Nhập dữ liệu" chọn file JSON đã xuất để nạp lại (hỏi xác nhận ghi đè
+  trước). Đây là cách chuyển dữ liệu sang máy khác khi chưa có cloud.
+  Trên iOS Safari file mở trong tab mới — dùng nút Share → Save to Files.
+
+### Đồng bộ cloud thật bằng Firebase (gói miễn phí Spark)
+
+- Module Firebase trong `app.js`: Firebase JS SDK (compat) nạp từ CDN
+  gstatic, cấu hình từ `FIREBASE_CONFIG` ở đầu file, mặc định để trống.
+  **Không bịa config/key giả.** Config trống → cloud TẮT, app chạy hoàn
+  toàn bằng local theo tài khoản + xuất/nhập file, Settings hiện rõ
+  "Đồng bộ cloud: chưa cấu hình", không lỗi console.
+- Khi có config: mọi thay đổi (thích, đăng ký/bỏ đăng ký, lưu, lịch sử,
+  đổi cài đặt/ngôn ngữ/chất lượng) tự đẩy lên cloud sau debounce ~2.5
+  giây, không cần bấm nút. Chiều ngược lại tự động theo thời gian thực
+  qua Firestore `onSnapshot`: máy khác đổi là tự tải về, gộp và cập nhật
+  ngay giao diện đang mở (không cần tải lại trang). Gộp thông minh từng
+  mục theo `updatedAt` (bản mới nhất thắng từng mục, không ghi đè cả bộ).
+  Mất mạng thì dùng local, có mạng lại thì đẩy tiếp. Trạng thái trong
+  Settings: đang bật/tắt, lần đồng bộ cuối, lỗi nếu có.
+- Firestore: collection `users`, doc id = `g_<sub>` (Google) hoặc
+  `e_<hash>` (Email — không lưu email trần làm doc id), 1 field `data`
+  (toàn bộ JSON) + `updatedAt` (map từng key → ms) + `updatedAtDoc`.
+- **Tạo project Firebase miễn phí:** console.firebase.google.com →
+  Add project → Build → Firestore Database → Create database (chế độ
+  **production mode**, chọn vị trí gần nhất) → Project settings → Your
+  apps → Web app (</>) → copy config → dán vào `FIREBASE_CONFIG`.
+- **Rules mẫu** (Firestore → Rules):
+  ```
+  rules_version = '2';
+  service cloud.firestore {
+    match /databases/{database}/documents {
+      match /users/{userId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+  ```
+  **Giới hạn bảo mật — nói thẳng:** rules trên chỉ có tác dụng khi bật
+  Firebase Auth; app này dùng GIS / Email local (không có Firebase
+  Auth) nên rules không xác minh được chủ sở hữu — doc id đã băm là rào
+  chắn duy nhất, đừng lưu dữ liệu nhạy cảm. Muốn bảo mật đúng nghĩa thì
+  bật Firebase Auth (Google provider) sau này.
+- Lưu ý: Email local không có xác thực server nên khóa đồng bộ chỉ là
+  định danh local.
+
+## Feed tải liên tục + live theo thời gian thực (mới, 2026-11-15)
+
+- **Thanh trên dính:** header (logo, tìm kiếm, avatar, cài đặt) + hàng
+  chips được bọc trong 1 wrapper `.topbar` sticky (top 0, nền đặc,
+  z-index 60). Safari/WKWebView không dính được khi cùng 1 phần tử vừa
+  `position: sticky` vừa `backdrop-filter` nên wrapper sticky KHÔNG có
+  backdrop-filter, header/chips giữ hiệu ứng kính mờ bên trong. Thanh
+  điều hướng dưới (5 tab) giữ nguyên.
+- **Feed tải liên tục, không giới hạn:** lướt hết feed Trang chủ (kể cả
+  khi bấm chip lọc) thì tự tải thêm — Piped `/trending` chỉ trả 1 danh
+  sách cố định nên khi hết, app xoay vòng các nguồn khác (tìm kiếm phổ
+  biến: nhạc, game, thể thao, tin tức… / trending khu vực khác), nối
+  tiếp vào feed, loại trùng id đã hiện, lọc đúng chip đang chọn. Chỉ
+  hiện "Hết video" khi đã thử nhiều nguồn mà vẫn không còn gì (hiếm).
+  Tìm kiếm dùng token `nextpage` của Piped `/search` để tải thêm trang
+  khi lướt tới cuối (cuộn vô hạn thật sự). Đang tải thì hiện spinner
+  "Đang tải thêm video…", lỗi mạng thì hiện nút thử lại.
+- **Live / sắp chiếu / ngày đăng:** video live không còn hiện
+  "-1:-1:-1" hay "56 năm trước". Duration -1 hiện huy hiệu đỏ
+  "Trực tiếp"; video sắp chiếu (ngày công chiếu trong tương lai) hiện
+  "Chưa chiếu" hoặc giờ công chiếu ("Chiếu lúc 16:10 • 15/11" theo giờ
+  máy). Ngày đăng dưới mỗi video (feed, màn xem, video liên quan,
+  Shorts) là **ngày tuyệt đối** theo locale của máy (vd. "15/11/2026"),
+  không còn "X ngày trước". Ngày không hợp lệ (<= 0 hoặc quá khứ xa như
+  1970) thì ẩn phần ngày. Giới hạn: dữ liệu danh sách Piped không có
+  trường `isLive`/`isUpcoming`, livestream trả `duration: -1` và
+  `uploaded: -1`, nên từ danh sách không phân biệt được "đang live" và
+  "sắp chiếu" — duration -1 luôn hiện "Trực tiếp" trừ khi có ngày công
+  chiếu trong tương lai. Ngày trong bình luận giữ nguyên thời gian tương
+  đối.
+- **Xem live theo thời gian thực:** mở video live là phát ngay tại điểm
+  live hiện tại (live edge), huy hiệu đỏ "TRỰC TIẾP" trong màn xem,
+  đồng hồ live cập nhật từng giây. Tua lại phía sau (DVR) thì hiện nút
+  "Quay lại trực tiếp" để nhảy về live edge. Luồng kết thúc thì hiện
+  "Luồng trực tiếp này đã kết thúc" (không đứng hình ở khung cuối);
+  video sắp chiếu vừa lên sóng thì tự chuyển sang trạng thái trực tiếp.
+  Chỉ dùng API YouTube đã có trong tài liệu (`getCurrentTime`,
+  `getDuration` — live là Infinity, `seekTo`, `getPlayerState`).
+  SponsorBlock được bỏ qua cho live (không có đoạn sponsor cố định).
+- **Video thường cũng cập nhật theo thời gian thực:** đồng hồ đã xem/
+  tổng thời gian + thanh tiến trình dưới màn xem chạy mượt, cập nhật
+  từng giây trong lúc phát; tua thì cập nhật trong vòng 1 giây; tạm dừng
+  thì đồng hồ dừng đúng chỗ. VOD và live dùng chung 1 vòng tick 1 giây,
+  chỉ khác live có thêm huy hiệu TRỰC TIẾP + nút "Quay lại trực tiếp".
+
 ## Chưa có (không port từ bản Android)
 
-PoToken, đăng nhập tài khoản Google (nhiều tài khoản), chế độ TV. Những
+PoToken, nhiều tài khoản YouTube, chế độ TV. Những
 tính năng này cần InnerTube / PoToken / server riêng — vượt khỏi phạm vi
-bản hiện tại chạy hoàn toàn bằng Piped + embed công khai.
+bản hiện tại chạy hoàn toàn bằng Piped + embed công khai. (Đăng nhập
+Google 1 tài khoản đã có — xem mục Đăng nhập bên dưới; cần Client ID.)
 
 ## Ghi chú kỹ thuật: vì sao embed kiểu này chạy được trên iOS
 
